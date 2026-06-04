@@ -1,36 +1,242 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SkillBridge 🎓
+**"Connect with Expert Tutors, Learn Anything"**
 
-## Getting Started
+---
 
-First, run the development server:
+## Project Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+SkillBridge is a full-stack web application that connects learners with expert tutors. Students can browse tutor profiles, view availability, and book sessions instantly. Tutors can manage their profiles, set availability, and track their teaching sessions. Admins oversee the platform and manage users.
+
+---
+
+## Roles & Permissions
+
+| Role | Description | Key Permissions |
+|------|-------------|-----------------|
+| **Student** | Learners who book tutoring sessions | Browse tutors, book sessions, leave reviews, manage profile |
+| **Tutor** | Experts who offer tutoring services | Create profile, set availability, view bookings, manage subjects |
+| **Admin** | Platform moderators | Manage all users, view analytics, moderate content |
+
+> 💡 **Note**: Users select their role during registration.Admin accounts should be seeded in the database.
+
+---
+
+## Tech Stack
+
+🛠️ **See [README.md](./README.md#-tech-stack) for complete technology specifications.**
+
+---
+
+## Features
+
+### Public Features
+- Browse and search tutors by subject, rating, and price
+- Filter tutors by category
+- View detailed tutor profiles with reviews
+- Landing page with featured tutors
+
+### Student Features
+- Register and login as student
+- Book tutoring sessions
+- View upcoming and past bookings
+- Leave reviews after sessions
+- Manage profile
+
+### Tutor Features
+- Register and login as tutor
+- Create and update tutor profile
+- Set availability slots
+- View teaching sessions
+- See ratings and reviews
+
+### Admin Features
+- View all users (students and tutors)
+- Manage user status (ban/unban)
+- View all bookings
+- Manage categories
+
+---
+
+## Pages & Routes
+
+> ⚠️ **Note**: These routes are examples. You may add, edit, or remove routes based on your implementation needs.
+
+### Public Routes
+| Route | Page | Description |
+|-------|------|-------------|
+| `/` | Home | Hero, search, featured tutors |
+| `/tutors` | Browse Tutors | List with filters |
+| `/tutors/:id` | Tutor Profile | Details, reviews, book |
+| `/login` | Login | Login form |
+| `/register` | Register | Registration form |
+
+### Student Routes (Private)
+| Route | Page | Description |
+|-------|------|-------------|
+| `/dashboard` | Dashboard | Overview, bookings |
+| `/dashboard/bookings` | My Bookings | Booking history |
+| `/dashboard/profile` | Profile | Edit info |
+
+### Tutor Routes (Private)
+| Route | Page | Description |
+|-------|------|-------------|
+| `/tutor/dashboard` | Dashboard | Sessions, stats |
+| `/tutor/availability` | Availability | Set time slots |
+| `/tutor/profile` | Profile | Edit tutor info |
+
+### Admin Routes (Private)
+| Route | Page | Description |
+|-------|------|-------------|
+| `/admin` | Dashboard | Statistics |
+| `/admin/users` | Users | Manage users |
+| `/admin/bookings` | Bookings | All bookings |
+| `/admin/categories` | Categories | Manage categories |
+
+---
+
+## Database Tables
+
+Design your own schema for the following tables:
+
+- **Users** - Store user information and authentication details
+- **TutorProfiles** - Tutor-specific information (linked to Users)
+- **Categories** - Subject categories for tutoring
+- **Bookings** - Session bookings between students and tutors
+- **Reviews** - Student reviews for tutors
+
+> 💡 *Think about what fields each table needs based on the features above.*
+
+---
+
+## API Endpoints
+
+> ⚠️ **Note**: These endpoints are examples. You may add, edit, or remove endpoints based on your implementation needs.
+
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Register new user |
+| POST | `/api/auth/login` | Login user |
+| GET | `/api/auth/me` | Get current user |
+
+### Tutors (Public)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tutors` | Get all tutors with filters |
+| GET | `/api/tutors/:id` | Get tutor details |
+| GET | `/api/categories` | Get all categories |
+
+### Bookings
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/bookings` | Create new booking |
+| GET | `/api/bookings` | Get user's bookings |
+| GET | `/api/bookings/:id` | Get booking details |
+
+### Tutor Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| PUT | `/api/tutor/profile` | Update tutor profile |
+| PUT | `/api/tutor/availability` | Update availability |
+
+### Reviews
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/reviews` | Create review |
+
+### Admin
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/admin/users` | Get all users |
+| PATCH | `/api/admin/users/:id` | Update user status |
+
+---
+
+## Flow Diagrams
+
+### 👨‍🎓 Student Journey
+
+```
+                              ┌──────────────┐
+                              │   Register   │
+                              └──────────────┘
+                                     │
+                                     ▼
+                              ┌──────────────┐
+                              │Browse Tutors │
+                              └──────────────┘
+                                     │
+                                     ▼
+                              ┌──────────────┐
+                              │ View Profile │
+                              └──────────────┘
+                                     │
+                                     ▼
+                              ┌──────────────┐
+                              │ Book Session │
+                              └──────────────┘
+                                     │
+                                     ▼
+                              ┌──────────────┐
+                              │    Attend    │
+                              └──────────────┘
+                                     │
+                                     ▼
+                              ┌──────────────┐
+                              │ Leave Review │
+                              └──────────────┘
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 👨‍🏫 Tutor Journey
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+                              ┌──────────────┐
+                              │   Register   │
+                              └──────────────┘
+                                     │
+                                     ▼
+                              ┌──────────────┐
+                              │Create Profile│
+                              └──────────────┘
+                                     │
+                                     ▼
+                              ┌──────────────┐
+                              │    Set       │
+                              │ Availability │
+                              └──────────────┘
+                                     │
+                                     ▼
+                              ┌──────────────┐
+                              │View Sessions │
+                              └──────────────┘
+                                     │
+                                     ▼
+                              ┌──────────────┐
+                              │Mark Complete │
+                              └──────────────┘
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 📊 Booking Status
 
-## Learn More
+```
+                              ┌──────────────┐
+                              │  CONFIRMED   │
+                              │   (instant)  │
+                              └──────────────┘
+                               /            \
+                              /              \
+                       (tutor)          (student)
+                        marks            cancels
+                            /                \
+                           ▼                  ▼
+                   ┌──────────────┐   ┌──────────────┐
+                   │  COMPLETED   │   │  CANCELLED   │
+                   └──────────────┘   └──────────────┘
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Submission
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+📋 **See [README.md](./README.md) for submission guidelines, timeline, and marks.**
+# skillBridge_client
