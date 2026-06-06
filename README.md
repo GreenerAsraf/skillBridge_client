@@ -257,3 +257,13 @@ To run this project locally, follow these steps:
 - `components`: Reusable UI components and modules.
 - `lib`: API clients and helper utilities.
 - `public`: Static assets (images, icons, etc.).
+
+
+## Client Routing
+
+- `/`: Public Home page.
+- `/tutors`: Searchable lists of tutors.
+- `/tutors/:id`: Detailed tutor profiles.
+- `/dashboard`: Student panel.
+- `/tutor/dashboard`: Tutor panel.
+- `/admin`: Administration panel.
