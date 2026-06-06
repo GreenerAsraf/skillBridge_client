@@ -7,6 +7,9 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/components/auth-provider'
 
+/**
+ * UserMenu manages profile badges and authentication state buttons.
+ */
 export function UserMenu() {
   const router = useRouter()
   const { user, logout } = useAuth()
