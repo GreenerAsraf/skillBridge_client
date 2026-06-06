@@ -20,6 +20,10 @@ export const metadata: Metadata = {
   description: 'SkillBridge - Connect and Learn'
 }
 
+/**
+ * RootLayout wraps the entire application with global providers
+ * and sets up typography variables.
+ */
 export default function RootLayout({
   children
 }: Readonly<{
