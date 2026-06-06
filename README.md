@@ -240,3 +240,12 @@ Design your own schema for the following tables:
 
 📋 **See [README.md](./README.md) for submission guidelines, timeline, and marks.**
 # skillBridge_client
+
+
+## Installation & Setup
+
+To run this project locally, follow these steps:
+1. Clone the repository.
+2. Run `npm install` to install dependencies.
+3. Configure your environment variables in `.env.local`.
+4. Run `npm run dev` to start the local development server.
