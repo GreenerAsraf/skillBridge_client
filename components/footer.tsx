@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { Github, Twitter, Linkedin, Heart, HelpCircle, Mail, MapPin } from 'lucide-react'
 
+/**
+ * Footer displays branding, navigation links, and copyright details at the bottom of the page.
+ */
 export default function Footer() {
   return (
     <footer className='relative border-t border-white/5 bg-slate-950 text-slate-400 overflow-hidden'>
