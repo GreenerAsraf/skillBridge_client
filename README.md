@@ -249,3 +249,11 @@ To run this project locally, follow these steps:
 2. Run `npm install` to install dependencies.
 3. Configure your environment variables in `.env.local`.
 4. Run `npm run dev` to start the local development server.
+
+
+## Project Directory Structure
+
+- `src/app`: Page components and routing structure.
+- `components`: Reusable UI components and modules.
+- `lib`: API clients and helper utilities.
+- `public`: Static assets (images, icons, etc.).
