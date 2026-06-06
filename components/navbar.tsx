@@ -4,6 +4,9 @@ import { NavigationSheet } from '@/components/navigation-sheet'
 import { UserMenu } from '@/components/user-menu'
 import Link from 'next/link'
 
+/**
+ * Navbar renders the global top navigation bar with branding, desktop links, and user menu.
+ */
 const Navbar = () => {
   return (
     <nav className='sticky top-0 z-50 h-16 border-b border-slate-900 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 backdrop-blur-md text-white shadow-xl'>
