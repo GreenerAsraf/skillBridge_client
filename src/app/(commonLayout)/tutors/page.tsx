@@ -44,7 +44,7 @@ export default function BrowseTutorsPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Filter by search + category
+  // Filter by search query, subject keywords, and category selections
   const filtered = tutors
     .filter((t) => {
       const name = t.user?.name?.toLowerCase() ?? ''
