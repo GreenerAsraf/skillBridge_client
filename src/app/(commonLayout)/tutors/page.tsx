@@ -72,7 +72,7 @@ export default function BrowseTutorsPage() {
     })
 
   return (
-    <div className='max-w-5xl mx-auto py-10 px-4 space-y-8'>
+    <div className='max-w-5xl mx-auto py-10 px-4 space-y-8 bg-slate-950'>
       <div>
         <h1 className='text-3xl font-bold'>Browse Tutors</h1>
         <p className='text-muted-foreground mt-1 text-sm'>Find the perfect tutor by subject, category, or name.</p>
@@ -97,11 +97,11 @@ export default function BrowseTutorsPage() {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className='flex h-9 w-full sm:w-48 rounded-md border border-input bg-transparent pl-9 pr-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none cursor-pointer'
+            className='flex h-9 w-full sm:w-48 rounded-md border border-slate-850 bg-slate-900 text-slate-100 pl-9 pr-8 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none cursor-pointer'
           >
-            <option value='ALL'>All Categories</option>
+            <option className='bg-slate-900 text-slate-100' value='ALL'>All Categories</option>
             {categories.map((c) => (
-              <option key={c.id} value={c.name}>{c.name}</option>
+              <option className='bg-slate-900 text-slate-100' key={c.id} value={c.name}>{c.name}</option>
             ))}
           </select>
         </div>
@@ -112,12 +112,12 @@ export default function BrowseTutorsPage() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className='flex h-9 w-full sm:w-52 rounded-md border border-input bg-transparent pl-9 pr-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none cursor-pointer'
+            className='flex h-9 w-full sm:w-52 rounded-md border border-slate-850 bg-slate-900 text-slate-100 pl-9 pr-8 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none cursor-pointer'
           >
-            <option value='default'>Sort: Default</option>
-            <option value='rating-desc'>Rating (High → Low)</option>
-            <option value='price-asc'>Price (Low → High)</option>
-            <option value='price-desc'>Price (High → Low)</option>
+            <option className='bg-slate-900 text-slate-100' value='default'>Sort: Default</option>
+            <option className='bg-slate-900 text-slate-100' value='rating-desc'>Rating (High → Low)</option>
+            <option className='bg-slate-900 text-slate-100' value='price-asc'>Price (Low → High)</option>
+            <option className='bg-slate-900 text-slate-100' value='price-desc'>Price (High → Low)</option>
           </select>
         </div>
       </div>
@@ -127,19 +127,19 @@ export default function BrowseTutorsPage() {
         <div className='flex flex-wrap gap-2 items-center'>
           <span className='text-xs text-muted-foreground'>Active filters:</span>
           {search && (
-            <span className='inline-flex items-center gap-1 text-xs bg-muted rounded-full px-2.5 py-1 font-medium'>
+            <span className='inline-flex items-center gap-1 text-xs bg-slate-800 text-slate-200 rounded-full px-2.5 py-1 font-medium'>
               Search: "{search}"
               <button onClick={() => setSearch('')} className='hover:text-destructive ml-0.5'>×</button>
             </span>
           )}
           {selectedCategory !== 'ALL' && (
-            <span className='inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 rounded-full px-2.5 py-1 font-medium'>
+            <span className='inline-flex items-center gap-1 text-xs bg-indigo-950 text-indigo-300 border border-indigo-900/50 rounded-full px-2.5 py-1 font-medium'>
               {selectedCategory}
               <button onClick={() => setSelectedCategory('ALL')} className='hover:text-destructive ml-0.5'>×</button>
             </span>
           )}
           {sortBy !== 'default' && (
-            <span className='inline-flex items-center gap-1 text-xs bg-purple-100 text-purple-700 rounded-full px-2.5 py-1 font-medium'>
+            <span className='inline-flex items-center gap-1 text-xs bg-purple-950 text-purple-300 border border-purple-900/50 rounded-full px-2.5 py-1 font-medium'>
               {sortBy === 'rating-desc' ? 'Rating ↓' : sortBy === 'price-asc' ? 'Price ↑' : 'Price ↓'}
               <button onClick={() => setSortBy('default')} className='hover:text-destructive ml-0.5'>×</button>
             </span>
@@ -161,7 +161,7 @@ export default function BrowseTutorsPage() {
       {loading ? (
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className='h-48 rounded-xl bg-muted animate-pulse' />
+            <div key={i} className='h-48 rounded-xl bg-slate-900 animate-pulse' />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -172,17 +172,17 @@ export default function BrowseTutorsPage() {
             <Link
               key={t.id}
               href={`/tutors/${t.id}`}
-              className='block rounded-xl border bg-card hover:shadow-md transition-shadow p-5 space-y-3'
+              className='block rounded-xl border border-slate-850 bg-slate-900/50 hover:bg-slate-900 hover:border-slate-700 hover:shadow-lg transition-all duration-300 p-5 space-y-3'
             >
               {/* Avatar */}
               <div className='flex items-center gap-3'>
-                <div className='h-10 w-10 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm'>
+                <div className='h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold flex items-center justify-center text-sm shadow-md'>
                   {(t.user?.name ?? '?')[0].toUpperCase()}
                 </div>
                 <div>
-                  <p className='font-semibold text-sm'>{t.user?.name ?? 'Tutor'}</p>
+                  <p className='font-semibold text-sm text-slate-100'>{t.user?.name ?? 'Tutor'}</p>
                   {(t.category || t.categories?.[0]) && (
-                    <p className='text-xs text-muted-foreground'>{t.category?.name ?? t.categories?.[0]?.name}</p>
+                    <p className='text-xs text-slate-400'>{t.category?.name ?? t.categories?.[0]?.name}</p>
                   )}
                 </div>
               </div>
@@ -191,23 +191,23 @@ export default function BrowseTutorsPage() {
               {t.subject && t.subject.length > 0 && (
                 <div className='flex flex-wrap gap-1'>
                   {t.subject.slice(0, 4).map((s) => (
-                    <span key={s} className='text-xs bg-muted rounded-full px-2 py-0.5'>{s}</span>
+                    <span key={s} className='text-[10px] bg-slate-800 text-slate-300 border border-white/5 rounded-full px-2.5 py-0.5'>{s}</span>
                   ))}
                 </div>
               )}
 
               {/* Bio */}
               {t.bio && (
-                <p className='text-xs text-muted-foreground line-clamp-2'>{t.bio}</p>
+                <p className='text-xs text-slate-400 line-clamp-2 leading-relaxed'>{t.bio}</p>
               )}
 
               {/* Rate + rating */}
-              <div className='flex items-center justify-between text-xs'>
-                <span className='font-semibold text-sm'>
+              <div className='flex items-center justify-between text-xs pt-1 border-t border-white/5'>
+                <span className='font-semibold text-sm text-slate-200'>
                   {t.hourlyPrice != null ? `$${t.hourlyPrice}/hr` : 'Price N/A'}
                 </span>
-                <span className='flex items-center gap-1 text-yellow-600'>
-                  <Star className='h-3 w-3 fill-yellow-400 stroke-yellow-400' />
+                <span className='flex items-center gap-1 text-amber-400'>
+                  <Star className='h-3 w-3 fill-amber-400 stroke-amber-400' />
                   {t.rating != null ? t.rating.toFixed(1) : 'New'}
                 </span>
               </div>

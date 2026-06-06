@@ -18,7 +18,7 @@ export default function AdminCategoriesPage() {
 
   function load() {
     setLoading(true)
-    apiFetch<{ data: Category[] }>('/categories')
+    apiFetch<{ data: Category[] }>('/api/categories')
       .then((r) => setCategories(r.data ?? []))
       .catch(() => {})
       .finally(() => setLoading(false))
@@ -31,7 +31,7 @@ export default function AdminCategoriesPage() {
     if (!newName.trim()) return
     setAdding(true)
     try {
-      await apiFetch('/categories', { method: 'POST', body: JSON.stringify({ name: newName.trim() }) })
+      await apiFetch('/api/categories', { method: 'POST', body: JSON.stringify({ name: newName.trim() }) })
       toast.success('Category added!')
       setNewName('')
       load()
@@ -44,7 +44,7 @@ export default function AdminCategoriesPage() {
 
   async function handleDelete(id: string) {
     try {
-      await apiFetch(`/categories/${id}`, { method: 'DELETE' })
+      await apiFetch(`/api/categories/${id}`, { method: 'DELETE' })
       toast.success('Category deleted')
       setCategories((prev) => prev.filter((c) => c.id !== id))
     } catch (err: any) {
