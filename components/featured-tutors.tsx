@@ -27,6 +27,9 @@ const FEATURED_TUTORS = [
   }
 ]
 
+/**
+ * FeaturedTutors displays top-rated educators on the landing page.
+ */
 export function FeaturedTutors() {
   return (
     <section className='border-t border-white/5 bg-slate-950 py-24 px-6 relative overflow-hidden'>
