@@ -19,7 +19,21 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
       ...options.headers,
     },
   })
-  const json = await res.json()
-  if (!res.ok) throw new Error(json.message || 'Request failed')
+  let json: any = null
+  const contentType = res.headers.get('content-type')
+  if (contentType && contentType.includes('application/json')) {
+    const text = await res.text()
+    if (text) {
+      try {
+        json = JSON.parse(text)
+      } catch {
+        // ignore parsing error
+      }
+    }
+  }
+
+  if (!res.ok) {
+    throw new Error(json?.message || `Request failed with status ${res.status}`)
+  }
   return json as T
 }

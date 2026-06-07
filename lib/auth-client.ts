@@ -37,10 +37,35 @@ async function authFetch<T>(
       body: JSON.stringify(body),
     });
 
-    const json = await res.json();
+    let json: any = null;
+    const contentType = res.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      const text = await res.text();
+      if (text) {
+        try {
+          json = JSON.parse(text);
+        } catch {
+          // ignore parsing error
+        }
+      }
+    }
 
-    if (!res.ok || !json.success) {
-      return { data: null, error: { message: json.message || "Request failed" } };
+    if (!res.ok) {
+      return {
+        data: null,
+        error: {
+          message: json?.message || `Request failed with status ${res.status}`,
+        },
+      };
+    }
+
+    if (!json || !json.success) {
+      return {
+        data: null,
+        error: {
+          message: json?.message || "Invalid response format",
+        },
+      };
     }
 
     return { data: json.data as T, error: null };
