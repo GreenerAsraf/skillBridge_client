@@ -21,7 +21,7 @@ import { useForm } from '@tanstack/react-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 import { useRouter } from 'next/navigation'
-import { signUp } from '@/lib/auth-client'
+import { signUp, betterAuthClient } from '@/lib/auth-client'
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -200,7 +200,17 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         <Button form='signup-form' type='submit' className='w-full'>
           Create Account
         </Button>
-        <Button variant='outline' type='button' className='w-full'>
+        <Button 
+          variant='outline' 
+          type='button' 
+          className='w-full'
+          onClick={async () => {
+            await betterAuthClient.signIn.social({
+              provider: 'google',
+              callbackURL: '/dashboard'
+            })
+          }}
+        >
           Sign up with Google
         </Button>
         <FieldDescription className='px-6 text-center'>

@@ -1,10 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-
+import { createAuthClient } from "better-auth/react";
 // ── Backend base URL ────────────────────────────────────────────────────
 const API_BASE =
   process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/+$/, "") ?? "";
+
+export const betterAuthClient = createAuthClient({
+  baseURL: API_BASE + "/api/auth",
+});
 
 // ── Token helpers ───────────────────────────────────────────────────────
 const TOKEN_KEY = "skillbridge_token";
