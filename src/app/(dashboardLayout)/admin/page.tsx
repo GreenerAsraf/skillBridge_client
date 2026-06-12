@@ -8,16 +8,24 @@ import { Users, BookOpen, Tag } from 'lucide-react'
 export default function AdminDashboardPage() {
   const [userCount, setUserCount] = useState<number | null>(null)
   const [bookingCount, setBookingCount] = useState<number | null>(null)
+ const [categoryCount, setCategoryCount] = useState<number | null>(null)
+
+
 
   useEffect(() => {
     apiFetch<{ data: unknown[] }>('/api/admin/users')
       .then((r) => setUserCount(r.data?.length ?? 0))
       .catch(() => {})
 
-    apiFetch<{ data: unknown[] }>('/bookings')
+    apiFetch<{ data: unknown[] }>('/api/admin/bookings')
       .then((r) => setBookingCount(r.data?.length ?? 0))
       .catch(() => {})
   }, [])
+
+   // Categories
+     apiFetch<{ data: unknown[] }>('/api/categories')
+      .then((r) => setCategoryCount(r.data?.length ?? 0))
+      .catch(() => {})
 
   return (
     <div className='space-y-6'>
@@ -49,7 +57,7 @@ export default function AdminDashboardPage() {
             <Tag className='h-4 w-4 text-purple-500' />
           </CardHeader>
           <CardContent>
-            <p className='text-3xl font-bold'>—</p>
+            <p className='text-3xl font-bold'>{categoryCount ?? '…'}</p>
           </CardContent>
         </Card>
       </div>
