@@ -4,6 +4,9 @@ type BookingLike = {
   id?: string
   status?: string
   paymentUrl?: string
+  date?: string
+  startTime?: string
+  endTime?: string
   booking?: { id?: string; status?: string }
 }
 

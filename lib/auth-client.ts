@@ -187,11 +187,33 @@ export function useSession() {
       });
 
       if (!res.ok) {
-        removeToken();
-        setUser(null);
+        let message = `Request failed with status ${res.status}`
+        try {
+          const json = await res.json()
+          if (json?.message) message = json.message
+        } catch {
+          // ignore parse errors
+        }
+        removeToken()
+        setUser(null)
+        if (typeof window !== 'undefined' && /blocked|banned/i.test(message)) {
+          window.sessionStorage.setItem('skillbridge_auth_error', message)
+        }
       } else {
-        const json = await res.json();
-        setUser(json.data as SessionUser);
+        const json = await res.json()
+        const sessionUser = json.data as SessionUser
+        if (sessionUser.status === 'BANNED' || sessionUser.status === 'BLOCKED') {
+          removeToken()
+          setUser(null)
+          if (typeof window !== 'undefined') {
+            window.sessionStorage.setItem(
+              'skillbridge_auth_error',
+              'Your account has been blocked. Please contact support.'
+            )
+          }
+          return
+        }
+        setUser(sessionUser)
       }
     } catch {
       removeToken();

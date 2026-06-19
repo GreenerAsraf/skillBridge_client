@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { apiFetch } from '@/lib/api'
 import { resolveBookingPayment, type ApiPayload } from '@/lib/booking-payment'
+import { buildStoredBooking, saveRecentBooking, type StoredBooking } from '@/lib/student-bookings'
 import { useAuth } from '@/components/auth-provider'
 import { Star, Clock, BookOpen, User, CheckCircle, MessageSquare } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -125,6 +126,21 @@ export default function TutorProfilePage() {
       }
 
       if (outcome?.type === 'confirmed') {
+        const created = bookingRes.data
+        if (created?.id) {
+          saveRecentBooking(
+            buildStoredBooking(
+              {
+                id: created.id,
+                status: (created.status as StoredBooking['status']) ?? 'CONFIRMED',
+                date: typeof created.date === 'string' ? created.date : undefined,
+                startTime: typeof created.startTime === 'string' ? created.startTime : undefined,
+                endTime: typeof created.endTime === 'string' ? created.endTime : undefined,
+              },
+              tutor ?? undefined
+            )
+          )
+        }
         toast.success('Session booked successfully!', { id: toastId })
         router.push('/dashboard/bookings')
         return

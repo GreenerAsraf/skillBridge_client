@@ -4,21 +4,14 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/components/auth-provider'
 import { apiFetch } from '@/lib/api'
 import { initiateBookingPayment } from '@/lib/booking-payment'
+import { fetchStudentBookings, type StoredBooking } from '@/lib/student-bookings'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CalendarCheck, Clock, CheckCircle, XCircle, Star, CreditCard } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 
-type Booking = {
-  id: string
-  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
-  date?: string
-  startTime?: string
-  scheduledAt?: string
-  tutor?: { user?: { name: string } }
-  review?: { id: string } | null
-}
+type Booking = StoredBooking
 
 const statusStyle: Record<string, string> = {
   PENDING: 'bg-amber-100 text-amber-700',
@@ -34,9 +27,15 @@ export default function StudentDashboardPage() {
   const [payingId, setPayingId] = useState<string | null>(null)
 
   useEffect(() => {
-    apiFetch<{ data: Booking[] }>('/api/bookings')
-      .then((res) => setBookings(res.data ?? []))
-      .catch(() => {})
+    fetchStudentBookings()
+      .then(({ bookings, warning }) => {
+        setBookings(bookings)
+        if (warning) toast.warning(warning)
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : 'Failed to load bookings'
+        toast.error(message)
+      })
       .finally(() => setLoading(false))
   }, [])
 

@@ -3,23 +3,15 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '@/lib/api'
 import { initiateBookingPayment } from '@/lib/booking-payment'
+import { fetchStudentBookings, type StoredBooking } from '@/lib/student-bookings'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Clock, Star } from 'lucide-react'
 import { toast } from 'sonner'
 
-type Review = { id: string }
+type Booking = StoredBooking
 
-type Booking = {
-  id: string
-  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
-  date?: string
-  startTime?: string
-  endTime?: string
-  scheduledAt?: string
-  tutor?: { user?: { name: string }; hourlyPrice?: number }
-  review?: Review | null
-}
+type Review = { id: string }
 
 const statusStyle: Record<string, string> = {
   PENDING: 'bg-amber-100 text-amber-700',
@@ -45,10 +37,20 @@ export default function StudentBookingsPage() {
   const [comment, setComment] = useState('')
   const [submittingReview, setSubmittingReview] = useState(false)
 
+  const [loadError, setLoadError] = useState<string | null>(null)
+
   useEffect(() => {
-    apiFetch<{ data: Booking[] }>('/api/bookings')
-      .then((res) => setBookings(res.data ?? []))
-      .catch(() => {})
+    fetchStudentBookings()
+      .then(({ bookings, warning }) => {
+        setBookings(bookings)
+        setLoadError(null)
+        if (warning) toast.warning(warning)
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : 'Failed to load bookings'
+        setLoadError(message)
+        toast.error(message)
+      })
       .finally(() => setLoading(false))
   }, [])
 
@@ -132,6 +134,10 @@ export default function StudentBookingsPage() {
   return (
     <div className='space-y-6'>
       <h1 className='text-2xl font-bold'>My Bookings</h1>
+
+      {loadError && bookings.length === 0 && (
+        <p className='text-sm text-destructive'>{loadError}</p>
+      )}
 
       {/* Filter tabs */}
       <div className='flex gap-2 flex-wrap'>

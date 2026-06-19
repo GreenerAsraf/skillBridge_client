@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input'
 import { signIn } from '@/lib/auth-client'
 import { useForm } from '@tanstack/react-form'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
@@ -30,6 +31,14 @@ const formSchema = z.object({
 
 export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
   const router = useRouter()
+
+  useEffect(() => {
+    const message = sessionStorage.getItem('skillbridge_auth_error')
+    if (message) {
+      sessionStorage.removeItem('skillbridge_auth_error')
+      toast.error(message)
+    }
+  }, [])
 
   const form = useForm({
     defaultValues: {
