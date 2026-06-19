@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { apiFetch } from '@/lib/api'
+import { initiateBookingPayment } from '@/lib/booking-payment'
 import { XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -20,12 +20,8 @@ export function PaymentFailContent() {
     setRetrying(true)
     const toastId = toast.loading('Initiating payment…')
     try {
-      const res = await apiFetch<{ data: { paymentUrl: string } }>(
-        `/api/payment/initiate/${bookingId}`,
-        { method: 'POST' }
-      )
+      const redirectUrl = await initiateBookingPayment(bookingId)
       toast.dismiss(toastId)
-      const redirectUrl = res?.data?.paymentUrl
       if (redirectUrl) {
         window.location.href = redirectUrl
       } else {

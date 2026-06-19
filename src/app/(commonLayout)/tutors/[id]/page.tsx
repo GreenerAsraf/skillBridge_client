@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { apiFetch } from '@/lib/api'
+import { resolveBookingPayment, type ApiPayload } from '@/lib/booking-payment'
 import { useAuth } from '@/components/auth-provider'
 import { Star, Clock, BookOpen, User, CheckCircle, MessageSquare } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -105,7 +106,7 @@ export default function TutorProfilePage() {
       const endHour = (startHour + 1).toString().padStart(2, '0')
       const endTimeStr = `${endHour}:${minutes}`
 
-      const bookingRes = await apiFetch<{ data: { booking: { id: string }; paymentUrl: string; transactionId: string } }>('/api/bookings', {
+      const bookingRes = await apiFetch<ApiPayload>('/api/bookings', {
         method: 'POST',
         body: JSON.stringify({
           tutorId: tutor?.id,
@@ -115,17 +116,25 @@ export default function TutorProfilePage() {
         }),
       })
 
-      // The booking endpoint auto-initiates SSLCommerz and returns the gateway URL
       toast.dismiss(toastId)
-      const redirectUrl = bookingRes?.data?.paymentUrl
-      if (redirectUrl) {
-        window.location.href = redirectUrl
-      } else {
-        toast.error('Payment URL not found. Please try again.', { id: toastId })
-        console.error('Booking response missing paymentUrl. Full response:', JSON.stringify(bookingRes, null, 2))
+      const outcome = await resolveBookingPayment(bookingRes)
+
+      if (outcome?.type === 'redirect') {
+        window.location.href = outcome.url
+        return
       }
-    } catch (err: any) {
-      toast.error(err.message ?? 'Booking failed', { id: toastId })
+
+      if (outcome?.type === 'confirmed') {
+        toast.success('Session booked successfully!', { id: toastId })
+        router.push('/dashboard/bookings')
+        return
+      }
+
+      toast.error('Could not start payment. Check My Bookings to pay or try again.', { id: toastId })
+      console.error('Unhandled booking response:', JSON.stringify(bookingRes, null, 2))
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Booking failed'
+      toast.error(message, { id: toastId })
     } finally {
       setBooking(false)
     }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { apiFetch } from '@/lib/api'
+import { initiateBookingPayment } from '@/lib/booking-payment'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Clock, Star } from 'lucide-react'
@@ -75,19 +76,17 @@ export default function StudentBookingsPage() {
     setPayingId(id)
     const toastId = toast.loading('Initiating payment…')
     try {
-      const res = await apiFetch<{ data: { paymentUrl: string } }>(`/api/payment/initiate/${id}`, {
-        method: 'POST',
-      })
+      const redirectUrl = await initiateBookingPayment(id)
       toast.dismiss(toastId)
-      const redirectUrl = res?.data?.paymentUrl || (res as any)?.paymentUrl
       if (redirectUrl) {
         window.location.href = redirectUrl
       } else {
         toast.error('Payment URL not found. Please try again or check console.', { id: toastId })
-        console.error('Payment initiate response missing paymentUrl:', res)
+        console.error('Payment initiate response missing paymentUrl for booking:', id)
       }
-    } catch (err: any) {
-      toast.error(err.message ?? 'Payment initiation failed', { id: toastId })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Payment initiation failed'
+      toast.error(message, { id: toastId })
     } finally {
       setPayingId(null)
     }

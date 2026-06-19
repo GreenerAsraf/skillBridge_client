@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/components/auth-provider'
 import { apiFetch } from '@/lib/api'
+import { initiateBookingPayment } from '@/lib/booking-payment'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CalendarCheck, Clock, CheckCircle, XCircle, Star, CreditCard } from 'lucide-react'
@@ -64,11 +65,8 @@ export default function StudentDashboardPage() {
     setPayingId(id)
     const toastId = toast.loading('Initiating payment…')
     try {
-      const res = await apiFetch<{ data: { paymentUrl: string } }>(`/api/payment/initiate/${id}`, {
-        method: 'POST',
-      })
+      const redirectUrl = await initiateBookingPayment(id)
       toast.dismiss(toastId)
-      const redirectUrl = res?.data?.paymentUrl
       if (redirectUrl) {
         window.location.href = redirectUrl
       } else {
