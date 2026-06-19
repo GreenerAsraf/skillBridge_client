@@ -105,7 +105,7 @@ export default function TutorProfilePage() {
       const endHour = (startHour + 1).toString().padStart(2, '0')
       const endTimeStr = `${endHour}:${minutes}`
 
-      const bookingRes = await apiFetch<{ data: { booking: { id: string }, paymentUrl: string } }>('/api/bookings', {
+      const bookingRes = await apiFetch<{ data: { booking: { id: string }; paymentUrl: string; transactionId: string } }>('/api/bookings', {
         method: 'POST',
         body: JSON.stringify({
           tutorId: tutor?.id,
@@ -115,14 +115,13 @@ export default function TutorProfilePage() {
         }),
       })
 
-      // Step 2: Redirect student to SSLCommerz
+      // The booking endpoint auto-initiates SSLCommerz and returns the gateway URL
       toast.dismiss(toastId)
-      const redirectUrl = bookingRes?.data?.paymentUrl || (bookingRes as any)?.paymentUrl
+      const redirectUrl = bookingRes?.data?.paymentUrl
       if (redirectUrl) {
         window.location.href = redirectUrl
       } else {
-        const errMsg = (bookingRes as any)?.message || 'Payment URL not found. Please try again.'
-        toast.error(errMsg, { id: toastId })
+        toast.error('Payment URL not found. Please try again.', { id: toastId })
         console.error('Booking response missing paymentUrl. Full response:', JSON.stringify(bookingRes, null, 2))
       }
     } catch (err: any) {
