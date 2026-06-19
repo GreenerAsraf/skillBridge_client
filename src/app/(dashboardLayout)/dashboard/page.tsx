@@ -5,13 +5,13 @@ import { useAuth } from '@/components/auth-provider'
 import { apiFetch } from '@/lib/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { CalendarCheck, Clock, CheckCircle, XCircle, Star } from 'lucide-react'
+import { CalendarCheck, Clock, CheckCircle, XCircle, Star, CreditCard } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 
 type Booking = {
   id: string
-  status: 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
+  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
   date?: string
   startTime?: string
   scheduledAt?: string
@@ -20,6 +20,7 @@ type Booking = {
 }
 
 const statusStyle: Record<string, string> = {
+  PENDING: 'bg-amber-100 text-amber-700',
   CONFIRMED: 'bg-blue-100 text-blue-700',
   COMPLETED: 'bg-green-100 text-green-700',
   CANCELLED: 'bg-red-100 text-red-700',
@@ -29,6 +30,7 @@ export default function StudentDashboardPage() {
   const { user } = useAuth()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
+  const [payingId, setPayingId] = useState<string | null>(null)
 
   useEffect(() => {
     apiFetch<{ data: Booking[] }>('/api/bookings')
@@ -37,7 +39,8 @@ export default function StudentDashboardPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const upcoming  = bookings.filter((b) => b.status === 'CONFIRMED')
+  const pending = bookings.filter((b) => b.status === 'PENDING')
+  const upcoming = bookings.filter((b) => b.status === 'CONFIRMED')
   const completed = bookings.filter((b) => b.status === 'COMPLETED')
   const cancelled = bookings.filter((b) => b.status === 'CANCELLED')
   const past = bookings.filter((b) => b.status === 'COMPLETED' || b.status === 'CANCELLED')
@@ -51,8 +54,31 @@ export default function StudentDashboardPage() {
       })
       setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status: 'CANCELLED' } : b)))
       toast.success('Session cancelled.', { id: toastId })
-    } catch (err: any) {
-      toast.error(err.message ?? 'Cancel failed', { id: toastId })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Cancel failed'
+      toast.error(message, { id: toastId })
+    }
+  }
+
+  async function handlePayNow(id: string) {
+    setPayingId(id)
+    const toastId = toast.loading('Initiating payment…')
+    try {
+      const res = await apiFetch<{ data: { paymentUrl: string } }>(`/api/payment/initiate/${id}`, {
+        method: 'POST',
+      })
+      toast.dismiss(toastId)
+      const redirectUrl = res?.data?.paymentUrl
+      if (redirectUrl) {
+        window.location.href = redirectUrl
+      } else {
+        toast.error('Payment URL not found. Please try again.', { id: toastId })
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Payment initiation failed'
+      toast.error(message, { id: toastId })
+    } finally {
+      setPayingId(null)
     }
   }
 
@@ -69,11 +95,20 @@ export default function StudentDashboardPage() {
     <div className='space-y-6'>
       <div>
         <h1 className='text-2xl font-bold'>Welcome back, {user?.name ?? 'Student'} 👋</h1>
-        <p className='text-muted-foreground text-sm mt-1'>Here's what's happening with your sessions.</p>
+        <p className='text-muted-foreground text-sm mt-1'>Here&apos;s what&apos;s happening with your sessions.</p>
       </div>
 
       {/* Stats */}
-      <div className='grid grid-cols-1 sm:grid-cols-4 gap-4'>
+      <div className='grid grid-cols-2 sm:grid-cols-5 gap-4'>
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between pb-2'>
+            <CardTitle className='text-sm font-medium'>Pending</CardTitle>
+            <CreditCard className='h-4 w-4 text-amber-500' />
+          </CardHeader>
+          <CardContent>
+            <p className='text-3xl font-bold'>{pending.length}</p>
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader className='flex flex-row items-center justify-between pb-2'>
             <CardTitle className='text-sm font-medium'>Upcoming</CardTitle>
@@ -111,6 +146,50 @@ export default function StudentDashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Pending payment */}
+      {pending.length > 0 && (
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between'>
+            <CardTitle className='text-base'>Pending Payment</CardTitle>
+            <Link href='/dashboard/bookings' className='text-xs text-muted-foreground underline hover:text-foreground'>
+              View all
+            </Link>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <p className='text-sm text-muted-foreground'>Loading…</p>
+            ) : (
+              <ul className='divide-y'>
+                {pending.map((b) => (
+                  <li key={b.id} className='py-3 flex items-center justify-between gap-4'>
+                    <div className='min-w-0'>
+                      <p className='text-sm font-medium'>{b.tutor?.user?.name ?? 'Tutor'}</p>
+                      <p className='text-xs text-muted-foreground flex items-center gap-1 mt-0.5'>
+                        <Clock className='h-3 w-3 shrink-0' />
+                        {formatDate(b)}
+                      </p>
+                    </div>
+                    <div className='flex items-center gap-2 shrink-0'>
+                      <span className={`text-xs rounded-full px-2 py-0.5 font-medium ${statusStyle.PENDING}`}>
+                        Pending
+                      </span>
+                      <Button
+                        size='sm'
+                        className='bg-amber-500 hover:bg-amber-600 text-white text-[11px] h-7 px-2.5 shadow-none'
+                        disabled={payingId === b.id}
+                        onClick={() => handlePayNow(b.id)}
+                      >
+                        {payingId === b.id ? 'Loading…' : 'Pay Now'}
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Upcoming sessions */}
       <Card>

@@ -7,31 +7,45 @@ import {
 } from 'react'
 import { signOut, useSession } from '@/lib/auth-client'
 
+type SessionUser = {
+  id: string
+  name: string
+  email: string
+  role: string
+  status: string
+}
+
 type AuthContextValue = {
-  user: any | null
+  user: SessionUser | null
   isPending: boolean
-  setUser: (user: any | null) => void // Kept for compatibility but does nothing
+  refetch: () => Promise<void>
   logout: () => void
 }
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   isPending: true,
-  setUser: () => {},
+  refetch: async () => {},
   logout: () => {},
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { data: session, isPending } = useSession()
+  const { data: session, isPending, refetch } = useSession()
 
   const logout = async () => {
     await signOut()
     window.location.href = '/login'
   }
 
-  // To keep compatibility, we ignore manual setUser.
   return (
-    <AuthContext.Provider value={{ user: session?.user || null, isPending, setUser: () => {}, logout }}>
+    <AuthContext.Provider
+      value={{
+        user: (session?.user as SessionUser | undefined) ?? null,
+        isPending,
+        refetch,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )

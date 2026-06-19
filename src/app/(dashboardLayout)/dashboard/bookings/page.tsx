@@ -11,7 +11,7 @@ type Review = { id: string }
 
 type Booking = {
   id: string
-  status: 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
+  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
   date?: string
   startTime?: string
   endTime?: string
@@ -21,6 +21,7 @@ type Booking = {
 }
 
 const statusStyle: Record<string, string> = {
+  PENDING: 'bg-amber-100 text-amber-700',
   CONFIRMED: 'bg-blue-100 text-blue-700',
   COMPLETED: 'bg-green-100 text-green-700',
   CANCELLED: 'bg-red-100 text-red-700',
@@ -35,6 +36,7 @@ export default function StudentBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('ALL')
+  const [payingId, setPayingId] = useState<string | null>(null)
 
   // Review modal state
   const [reviewModal, setReviewModal] = useState<ReviewModal | null>(null)
@@ -51,6 +53,8 @@ export default function StudentBookingsPage() {
 
   const filtered = filter === 'ALL' ? bookings : bookings.filter((b) => b.status === filter)
 
+  const filterOptions = ['ALL', 'PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED']
+
   // ─── Cancel booking ───────────────────────────────────────────────────────────
   async function handleCancel(id: string) {
     const toastId = toast.loading('Cancelling session…')
@@ -63,6 +67,29 @@ export default function StudentBookingsPage() {
       toast.success('Session cancelled.', { id: toastId })
     } catch (err: any) {
       toast.error(err.message ?? 'Cancel failed', { id: toastId })
+    }
+  }
+
+  // ─── Pay now (for PENDING bookings) ──────────────────────────────────────────
+  async function handlePayNow(id: string) {
+    setPayingId(id)
+    const toastId = toast.loading('Initiating payment…')
+    try {
+      const res = await apiFetch<{ data: { paymentUrl: string } }>(`/api/payment/initiate/${id}`, {
+        method: 'POST',
+      })
+      toast.dismiss(toastId)
+      const redirectUrl = res?.data?.paymentUrl || (res as any)?.paymentUrl
+      if (redirectUrl) {
+        window.location.href = redirectUrl
+      } else {
+        toast.error('Payment URL not found. Please try again or check console.', { id: toastId })
+        console.error('Payment initiate response missing paymentUrl:', res)
+      }
+    } catch (err: any) {
+      toast.error(err.message ?? 'Payment initiation failed', { id: toastId })
+    } finally {
+      setPayingId(null)
     }
   }
 
@@ -109,7 +136,7 @@ export default function StudentBookingsPage() {
 
       {/* Filter tabs */}
       <div className='flex gap-2 flex-wrap'>
-        {['ALL', 'CONFIRMED', 'COMPLETED', 'CANCELLED'].map((s) => (
+        {filterOptions.map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
@@ -148,6 +175,18 @@ export default function StudentBookingsPage() {
                     <span className={`text-xs rounded-full px-2.5 py-0.5 font-medium ${statusStyle[b.status]}`}>
                       {b.status}
                     </span>
+
+                    {/* Pay Now button for PENDING */}
+                    {b.status === 'PENDING' && (
+                      <Button
+                        size='sm'
+                        className='bg-amber-500 hover:bg-amber-600 text-white text-[11px] h-7 px-2.5 shadow-none'
+                        disabled={payingId === b.id}
+                        onClick={() => handlePayNow(b.id)}
+                      >
+                        {payingId === b.id ? 'Loading…' : '💳 Pay Now'}
+                      </Button>
+                    )}
 
                     {/* Cancel button for CONFIRMED */}
                     {b.status === 'CONFIRMED' && (

@@ -1,12 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Bake public (non-secret) URLs into the build so they work on Vercel
-  // without needing manual environment variable configuration.
-  env: {
-    NEXT_PUBLIC_BACKEND_URL: "https://skillbridgebackend-production-19ba.up.railway.app",
-    NEXT_PUBLIC_APP_URL: "https://skill-bridge-client-pi.vercel.app",
-  },
+  // NEXT_PUBLIC_BACKEND_URL and NEXT_PUBLIC_APP_URL are set per-environment:
+  // - Development: .env.local (http://localhost:5000)
+  // - Production:  Vercel environment variables dashboard
+  // Do NOT hardcode them here — next.config.ts env overrides ALL .env files.
 };
 
 export default nextConfig;
+

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/components/auth-provider'
 import { apiFetch } from '@/lib/api'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -9,19 +9,24 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 
 export default function StudentProfilePage() {
-  const { user, setUser } = useAuth()
+  const { user, refetch } = useAuth()
   const [name, setName] = useState(user?.name ?? '')
   const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (user?.name) setName(user.name)
+  }, [user?.name])
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
     try {
-      await apiFetch('/auth/me', { method: 'PATCH', body: JSON.stringify({ name }) })
-      if (user) setUser({ ...user, name })
+      await apiFetch('/api/auth/me', { method: 'PATCH', body: JSON.stringify({ name }) })
+      await refetch()
       toast.success('Profile updated!')
-    } catch (err: any) {
-      toast.error(err.message ?? 'Failed to update profile')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update profile'
+      toast.error(message)
     } finally {
       setSaving(false)
     }

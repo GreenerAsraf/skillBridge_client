@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { apiFetch } from '@/lib/api'
 import { useAuth } from '@/components/auth-provider'
 import { Star, Clock, BookOpen, User, CheckCircle, MessageSquare } from 'lucide-react'
@@ -41,6 +41,7 @@ type Slot = { day: string; time: string }
 export default function TutorProfilePage() {
   const { id } = useParams()
   const { user } = useAuth()
+  const router = useRouter()
   const [tutor, setTutor] = useState<TutorProfile | null>(null)
   const [availability, setAvailability] = useState<Slot[]>([])
   const [loading, setLoading] = useState(true)
@@ -83,6 +84,7 @@ export default function TutorProfilePage() {
     }
 
     setBooking(true)
+    const toastId = toast.loading('Creating booking…')
     try {
       // Calculate target date (YYYY-MM-DD)
       const date = new Date()
@@ -103,7 +105,7 @@ export default function TutorProfilePage() {
       const endHour = (startHour + 1).toString().padStart(2, '0')
       const endTimeStr = `${endHour}:${minutes}`
 
-      await apiFetch('/api/bookings', {
+      const bookingRes = await apiFetch<{ data: { booking: { id: string }, paymentUrl: string } }>('/api/bookings', {
         method: 'POST',
         body: JSON.stringify({
           tutorId: tutor?.id,
@@ -112,9 +114,19 @@ export default function TutorProfilePage() {
           endTime: endTimeStr
         }),
       })
-      toast.success('Session booked successfully!')
+
+      // Step 2: Redirect student to SSLCommerz
+      toast.dismiss(toastId)
+      const redirectUrl = bookingRes?.data?.paymentUrl || (bookingRes as any)?.paymentUrl
+      if (redirectUrl) {
+        window.location.href = redirectUrl
+      } else {
+        const errMsg = (bookingRes as any)?.message || 'Payment URL not found. Please try again.'
+        toast.error(errMsg, { id: toastId })
+        console.error('Booking response missing paymentUrl. Full response:', JSON.stringify(bookingRes, null, 2))
+      }
     } catch (err: any) {
-      toast.error(err.message ?? 'Booking failed')
+      toast.error(err.message ?? 'Booking failed', { id: toastId })
     } finally {
       setBooking(false)
     }

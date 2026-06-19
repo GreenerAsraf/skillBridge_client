@@ -10,6 +10,27 @@ import { toast } from 'sonner'
 
 type Category = { id: string; name: string }
 
+type TutorProfile = {
+  bio?: string
+  hourlyPrice?: number
+  subject?: string[]
+  categoryId?: string
+  category?: { id: string; name: string }
+  user?: { email: string }
+}
+
+async function loadTutorProfile(userEmail: string): Promise<TutorProfile | null> {
+  try {
+    const res = await apiFetch<{ data: TutorProfile }>('/api/tutor/profile')
+    if (res.data) return res.data
+  } catch {
+    // fall back to listing tutors if GET is not supported
+  }
+
+  const tutorRes = await apiFetch<{ data: TutorProfile[] }>('/api/tutors')
+  return tutorRes.data?.find((t) => t.user?.email === userEmail) ?? null
+}
+
 export default function TutorProfilePage() {
   const { user } = useAuth()
   const [bio, setBio] = useState('')
@@ -24,13 +45,12 @@ export default function TutorProfilePage() {
     if (!user) return
 
     Promise.all([
-      apiFetch<{ data: any[] }>('/api/tutors'),
+      loadTutorProfile(user.email),
       apiFetch<{ data: Category[] }>('/api/categories').catch(() => ({ data: [] as Category[] })),
     ])
-      .then(([tutorRes, catRes]) => {
+      .then(([myProfile, catRes]) => {
         setCategories(catRes.data ?? [])
 
-        const myProfile = tutorRes.data?.find((t) => t.user?.email === user.email)
         if (myProfile) {
           setBio(myProfile.bio ?? '')
           setSubjects(myProfile.subject?.join(', ') ?? '')
@@ -56,11 +76,21 @@ export default function TutorProfilePage() {
         }),
       })
       toast.success('Tutor profile saved!')
-    } catch (err: any) {
-      toast.error(err.message ?? 'Failed to save profile')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to save profile'
+      toast.error(message)
     } finally {
       setSaving(false)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className='max-w-lg space-y-6'>
+        <h1 className='text-2xl font-bold'>Tutor Profile</h1>
+        <p className='text-sm text-muted-foreground'>Loading profile…</p>
+      </div>
+    )
   }
 
   return (

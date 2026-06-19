@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Search, Star, Users, BookOpen } from 'lucide-react'
+import { Star, Users, BookOpen } from 'lucide-react'
 import { FeaturedTutors } from '@/components/featured-tutors'
+import HeroSearchForm from '@/components/hero-search-form'
 
 export default function HomePage() {
   return (
@@ -22,7 +23,10 @@ export default function HomePage() {
           <p className='text-lg md:text-xl text-slate-400 max-w-2xl mx-auto font-light leading-relaxed'>
             Browse hundreds of verified tutors, book instant sessions, and unlock your potential with custom learning schedules.
           </p>
-          <div className='flex flex-col sm:flex-row gap-4 justify-center items-center pt-4'>
+
+          <HeroSearchForm />
+
+          <div className='flex flex-col sm:flex-row gap-4 justify-center items-center pt-2'>
             <Button asChild size='lg' className='text-base px-8 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-bold shadow-lg shadow-emerald-500/20 transition-all duration-300 hover:scale-[1.02] border-0'>
               <Link href='/tutors'>Browse Tutors</Link>
             </Button>

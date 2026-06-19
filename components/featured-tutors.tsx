@@ -2,38 +2,45 @@ import Link from 'next/link'
 import { Star, CheckCircle, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-const FEATURED_TUTORS = [
-  {
-    id: 'tutor-1',
-    name: 'Dr. Sarah Jenkins',
-    image: '/tutor1.png',
-    subject: 'Computer Science & AI',
-    rating: '4.9',
-    reviews: '142',
-    price: '$45',
-    bio: 'Former senior software engineer at Google, specializing in React, Next.js, and machine learning foundations.',
-    tags: ['JavaScript', 'Python', 'Machine Learning']
-  },
-  {
-    id: 'tutor-2',
-    name: 'Prof. David Miller',
-    image: '/tutor2.png',
-    subject: 'Advanced Mathematics & Physics',
-    rating: '4.8',
-    reviews: '98',
-    price: '$50',
-    bio: '10+ years teaching university physics. Passionate about making complex calculus and mechanics easy to grasp.',
-    tags: ['Calculus', 'Linear Algebra', 'Quantum Physics']
+type Tutor = {
+  id: string
+  bio?: string
+  hourlyPrice?: number
+  subject?: string[]
+  user?: { name: string }
+  category?: { name: string }
+  categories?: Array<{ name: string }>
+  rating?: number
+  _count?: { reviews: number }
+}
+
+async function fetchFeaturedTutors(): Promise<Tutor[]> {
+  const apiBase = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/+$/, '') ?? ''
+  if (!apiBase) return []
+
+  try {
+    const res = await fetch(`${apiBase}/api/tutors`, { next: { revalidate: 60 } })
+    if (!res.ok) return []
+
+    const json = await res.json()
+    const tutors: Tutor[] = json.data ?? []
+
+    return [...tutors]
+      .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
+      .slice(0, 2)
+  } catch {
+    return []
   }
-]
+}
 
 /**
  * FeaturedTutors displays top-rated educators on the landing page.
  */
-export function FeaturedTutors() {
+export async function FeaturedTutors() {
+  const featuredTutors = await fetchFeaturedTutors()
+
   return (
     <section className='border-t border-white/5 bg-slate-950 py-24 px-6 relative overflow-hidden'>
-      {/* Background glow decoration */}
       <div className='absolute bottom-0 right-1/4 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none' />
 
       <div className='max-w-5xl mx-auto'>
@@ -57,59 +64,76 @@ export function FeaturedTutors() {
           </Button>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-          {FEATURED_TUTORS.map((tutor) => (
-            <div
-              key={tutor.id}
-              className='group relative flex flex-col sm:flex-row gap-6 p-6 rounded-2xl bg-slate-900/40 border border-white/5 hover:border-slate-800 transition-all duration-300 hover:bg-slate-900/70'
-            >
-              {/* Image container */}
-              <div className='relative w-full sm:w-36 h-48 sm:h-36 rounded-xl overflow-hidden shrink-0 border border-white/10'>
-                <img
-                  src={tutor.image}
-                  alt={tutor.name}
-                  className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
-                />
-                <span className='absolute bottom-2 right-2 bg-slate-950/85 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-white border border-white/5'>
-                  {tutor.price}/hr
-                </span>
-              </div>
+        {featuredTutors.length === 0 ? (
+          <p className='text-sm text-slate-400 text-center py-8'>
+            No tutors available yet.{' '}
+            <Link href='/register' className='text-indigo-400 underline hover:text-indigo-300'>
+              Become a tutor
+            </Link>{' '}
+            or check back soon.
+          </p>
+        ) : (
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+            {featuredTutors.map((tutor) => {
+              const name = tutor.user?.name ?? 'Tutor'
+              const categoryName = tutor.category?.name ?? tutor.categories?.[0]?.name ?? 'General'
+              const tags = tutor.subject?.slice(0, 3) ?? []
+              const ratingLabel = tutor.rating != null ? tutor.rating.toFixed(1) : 'New'
+              const priceLabel = tutor.hourlyPrice != null ? `$${tutor.hourlyPrice}` : 'N/A'
 
-              {/* Tutor info */}
-              <div className='flex-1 flex flex-col justify-between space-y-4 sm:space-y-0'>
-                <div>
-                  <div className='flex items-start justify-between'>
-                    <div>
-                      <h3 className='font-bold text-lg text-white group-hover:text-emerald-400 transition-colors duration-300 flex items-center gap-1.5'>
-                        {tutor.name}
-                        <CheckCircle className='h-4 w-4 text-emerald-400 fill-emerald-500/10' />
-                      </h3>
-                      <p className='text-xs text-indigo-300 font-semibold mt-0.5'>{tutor.subject}</p>
-                    </div>
-                    <div className='flex items-center gap-1 bg-amber-500/10 text-amber-300 border border-amber-500/20 px-2 py-0.5 rounded-lg text-xs font-semibold'>
-                      <Star className='h-3 w-3 fill-amber-300 text-amber-300' />
-                      <span>{tutor.rating}</span>
-                    </div>
-                  </div>
-                  <p className='text-xs text-slate-400 font-light mt-3 leading-relaxed'>
-                    {tutor.bio}
-                  </p>
-                </div>
-
-                <div className='flex flex-wrap gap-1.5 pt-3 sm:pt-0'>
-                  {tutor.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className='text-[10px] px-2 py-0.5 rounded-md bg-slate-800/60 text-slate-350 border border-white/5'
-                    >
-                      {tag}
+              return (
+                <Link
+                  key={tutor.id}
+                  href={`/tutors/${tutor.id}`}
+                  className='group relative flex flex-col sm:flex-row gap-6 p-6 rounded-2xl bg-slate-900/40 border border-white/5 hover:border-slate-800 transition-all duration-300 hover:bg-slate-900/70'
+                >
+                  <div className='relative w-full sm:w-36 h-48 sm:h-36 rounded-xl overflow-hidden shrink-0 border border-white/10 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center'>
+                    <span className='text-4xl font-bold text-white'>
+                      {name[0]?.toUpperCase() ?? '?'}
                     </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+                    <span className='absolute bottom-2 right-2 bg-slate-950/85 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-white border border-white/5'>
+                      {priceLabel}/hr
+                    </span>
+                  </div>
+
+                  <div className='flex-1 flex flex-col justify-between space-y-4 sm:space-y-0'>
+                    <div>
+                      <div className='flex items-start justify-between'>
+                        <div>
+                          <h3 className='font-bold text-lg text-white group-hover:text-emerald-400 transition-colors duration-300 flex items-center gap-1.5'>
+                            {name}
+                            <CheckCircle className='h-4 w-4 text-emerald-400 fill-emerald-500/10' />
+                          </h3>
+                          <p className='text-xs text-indigo-300 font-semibold mt-0.5'>{categoryName}</p>
+                        </div>
+                        <div className='flex items-center gap-1 bg-amber-500/10 text-amber-300 border border-amber-500/20 px-2 py-0.5 rounded-lg text-xs font-semibold'>
+                          <Star className='h-3 w-3 fill-amber-300 text-amber-300' />
+                          <span>{ratingLabel}</span>
+                        </div>
+                      </div>
+                      <p className='text-xs text-slate-400 font-light mt-3 leading-relaxed line-clamp-3'>
+                        {tutor.bio ?? 'Experienced tutor ready to help you learn.'}
+                      </p>
+                    </div>
+
+                    {tags.length > 0 && (
+                      <div className='flex flex-wrap gap-1.5 pt-3 sm:pt-0'>
+                        {tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className='text-[10px] px-2 py-0.5 rounded-md bg-slate-800/60 text-slate-350 border border-white/5'
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        )}
       </div>
     </section>
   )

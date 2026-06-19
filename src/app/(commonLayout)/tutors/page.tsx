@@ -32,6 +32,16 @@ export default function BrowseTutorsPage() {
   const [sortBy, setSortBy] = useState<SortOption>('default')
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const q = params.get('search') || params.get('query') || params.get('searchTerm') || ''
+      if (q) {
+        setSearch(q)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     Promise.all([
       apiFetch<{ data: Tutor[] }>('/api/tutors'),
       apiFetch<{ data: Category[] }>('/api/categories').catch(() => ({ data: [] as Category[] })),
