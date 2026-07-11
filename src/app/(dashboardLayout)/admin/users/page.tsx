@@ -18,6 +18,11 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Pagination & Sorting State
+  const [currentPage, setCurrentPage] = useState(1)
+  const [sortConfig, setSortConfig] = useState<{ key: keyof User; direction: 'asc' | 'desc' } | null>(null)
+  const itemsPerPage = 10
+
   useEffect(() => {
     apiFetch<{ data: User[] }>('/api/admin/users')
       .then((r) => setUsers(r.data ?? []))
@@ -39,11 +44,34 @@ export default function AdminUsersPage() {
     }
   }
 
+  // Sorting
+  const handleSort = (key: keyof User) => {
+    let direction: 'asc' | 'desc' = 'asc'
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc'
+    }
+    setSortConfig({ key, direction })
+  }
+
+  const sortedUsers = [...users].sort((a, b) => {
+    if (!sortConfig) return 0
+    const aValue = a[sortConfig.key] || ''
+    const bValue = b[sortConfig.key] || ''
+    
+    if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1
+    if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1
+    return 0
+  })
+
+  // Pagination
+  const totalPages = Math.ceil(sortedUsers.length / itemsPerPage)
+  const paginatedUsers = sortedUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+
   return (
     <div className='space-y-6'>
       <h1 className='text-2xl font-bold'>Manage Users</h1>
 
-      <Card>
+      <Card className='border-white/10 bg-slate-900/60'>
         <CardHeader>
           <CardTitle className='text-base'>All Users</CardTitle>
         </CardHeader>
@@ -51,43 +79,102 @@ export default function AdminUsersPage() {
           {loading ? (
             <p className='text-sm text-muted-foreground'>Loading…</p>
           ) : (
-            <div className='overflow-x-auto'>
-              <table className='w-full text-sm'>
-                <thead>
-                  <tr className='border-b text-muted-foreground text-xs'>
-                    <th className='text-left py-2 pr-4'>Name</th>
-                    <th className='text-left py-2 pr-4'>Email</th>
-                    <th className='text-left py-2 pr-4'>Role</th>
-                    <th className='text-left py-2 pr-4'>Status</th>
-                    <th className='text-left py-2'>Action</th>
-                  </tr>
-                </thead>
-                <tbody className='divide-y'>
-                  {users.map((u) => (
-                    <tr key={u.id}>
-                      <td className='py-2.5 pr-4 font-medium'>{u.name}</td>
-                      <td className='py-2.5 pr-4 text-muted-foreground'>{u.email}</td>
-                      <td className='py-2.5 pr-4'>
-                        <span className='text-xs rounded-full bg-muted px-2 py-0.5'>{u.role}</span>
-                      </td>
-                      <td className='py-2.5 pr-4'>
-                        <span className={`text-xs rounded-full px-2 py-0.5 ${u.status === 'BANNED' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                          {u.status ?? 'ACTIVE'}
-                        </span>
-                      </td>
-                      <td className='py-2.5'>
-                        <Button
-                          size='sm'
-                          variant={u.status === 'BANNED' ? 'outline' : 'destructive'}
-                          onClick={() => toggleBan(u.id, u.status)}
-                        >
-                          {u.status === 'BANNED' ? 'Unban' : 'Ban'}
-                        </Button>
-                      </td>
+            <div className='space-y-4'>
+              <div className='overflow-x-auto rounded-lg border border-white/5'>
+                <table className='w-full text-sm text-left'>
+                  <thead className='bg-slate-900/80 text-muted-foreground text-xs uppercase tracking-wider border-b border-white/5'>
+                    <tr>
+                      <th className='px-4 py-3 cursor-pointer hover:text-white transition-colors' onClick={() => handleSort('name')}>
+                        Name {sortConfig?.key === 'name' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className='px-4 py-3 cursor-pointer hover:text-white transition-colors' onClick={() => handleSort('email')}>
+                        Email {sortConfig?.key === 'email' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className='px-4 py-3 cursor-pointer hover:text-white transition-colors' onClick={() => handleSort('role')}>
+                        Role {sortConfig?.key === 'role' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className='px-4 py-3 cursor-pointer hover:text-white transition-colors' onClick={() => handleSort('status')}>
+                        Status {sortConfig?.key === 'status' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className='px-4 py-3'>Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className='divide-y divide-white/5 bg-slate-900/40'>
+                    {paginatedUsers.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className='px-4 py-8 text-center text-muted-foreground'>No users found.</td>
+                      </tr>
+                    ) : (
+                      paginatedUsers.map((u) => (
+                        <tr key={u.id} className='hover:bg-white/[0.02] transition-colors'>
+                          <td className='px-4 py-3 font-medium'>{u.name}</td>
+                          <td className='px-4 py-3 text-muted-foreground'>{u.email}</td>
+                          <td className='px-4 py-3'>
+                            <span className='text-[10px] font-semibold tracking-wider rounded-full bg-slate-800 text-slate-300 px-2 py-0.5 border border-white/10'>
+                              {u.role}
+                            </span>
+                          </td>
+                          <td className='px-4 py-3'>
+                            <span className={`text-[10px] font-semibold tracking-wider rounded-full px-2 py-0.5 border ${
+                              u.status === 'BANNED' 
+                                ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' 
+                                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                            }`}>
+                              {u.status ?? 'ACTIVE'}
+                            </span>
+                          </td>
+                          <td className='px-4 py-3'>
+                            <Button
+                              size='sm'
+                              variant='ghost'
+                              className={
+                                u.status === 'BANNED' 
+                                  ? 'h-8 text-xs bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20' 
+                                  : 'h-8 text-xs bg-rose-500/10 text-rose-400 hover:bg-rose-500/20'
+                              }
+                              onClick={() => toggleBan(u.id, u.status)}
+                            >
+                              {u.status === 'BANNED' ? 'Unban' : 'Ban'}
+                            </Button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className='flex items-center justify-between pt-2'>
+                  <p className='text-xs text-muted-foreground'>
+                    Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, users.length)} of {users.length} users
+                  </p>
+                  <div className='flex items-center gap-2'>
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      className='h-8 border-white/10'
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    >
+                      Previous
+                    </Button>
+                    <div className='text-sm font-medium px-2'>
+                      {currentPage} / {totalPages}
+                    </div>
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      className='h-8 border-white/10'
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </CardContent>

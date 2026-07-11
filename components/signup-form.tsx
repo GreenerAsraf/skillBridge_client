@@ -26,6 +26,7 @@ import { signUp, betterAuthClient } from '@/lib/auth-client'
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required'),
   email: z.email('Invalid email address'),
+  image: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   password: z.string().min(8, 'Minimum length is 8'),
   confirmPassword: z.string(),
   role: z.enum(['STUDENT', 'TUTOR'], {
@@ -42,6 +43,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     defaultValues: {
       name: '',
       email: '',
+      image: '',
       password: '',
       confirmPassword: '',
       role: 'STUDENT' as 'STUDENT' | 'TUTOR'
@@ -56,6 +58,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         name: value.name,
         email: value.email,
         password: value.password,
+        image: value.image || undefined,
         role: value.role, // already uppercase: 'STUDENT' | 'TUTOR'
       })
 
@@ -124,6 +127,27 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
                       placeholder='m@example.com'
+                    />
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                )
+              }}
+            />
+
+            <form.Field
+              name='image'
+              children={(field) => {
+                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field>
+                    <FieldLabel htmlFor={field.name}>Profile Picture URL (Optional)</FieldLabel>
+                    <Input
+                      type='url'
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder='https://example.com/avatar.jpg'
                     />
                     {isInvalid && <FieldError errors={field.state.meta.errors} />}
                   </Field>

@@ -2,16 +2,12 @@ import Navbar from '@/components/navbar'
 import Footer from '@/components/footer'
 import React from 'react'
 
-const CommonLayout = ({ children }: { children: React.ReactNode }) => {
+export default function CommonLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className='bg-slate-950 text-slate-100 min-h-screen flex flex-col'>
+    <div className='bg-background text-foreground min-h-screen flex flex-col transition-colors duration-300'>
       <Navbar />
-      <div className='flex-grow'>
-        {children}
-      </div>
+      <main className='flex-1'>{children}</main>
       <Footer />
     </div>
   )
 }
-
-export default CommonLayout

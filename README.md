@@ -151,7 +151,10 @@ Design your own schema for the following tables:
 | PATCH | `/api/admin/users/:id` | Update user status |
 
 ---
-
+BETTER_AUTH_SECRET="${{secret()}}"
+BETTER_AUTH_URL="https://skillbridgebackend-production-19ba.up.railway.app"
+DATABASE_URL="postgresql://neondb_owner:npg_8lvTN9cEnyYR@ep-damp-sea-aijtvoij-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+FRONTEND_URL="https://skill-bridge-client-pi.vercel.app"
 ## Flow Diagrams
 
 ### 👨‍🎓 Student Journey
@@ -267,3 +270,19 @@ To run this project locally, follow these steps:
 - `/dashboard`: Student panel.
 - `/tutor/dashboard`: Tutor panel.
 - `/admin`: Administration panel.
+ 
+
+
+ Frontend Repo: https://github.com/GreenerAsraf/skillBridge_client
+
+Backend Repo: https://github.com/GreenerAsraf/skillBridge_backend
+
+Frontend Live: https://skill-bridge-client-pi.vercel.app/
+
+Backend Live: https://skillbridgebackend-production-19ba.up.railway.app/
+
+Demo Video: https://www.loom.com/share/881015c6bfc24272a1451721fd03b7e8
+
+Admin Email: admin@example.com
+
+Admin Password: password123

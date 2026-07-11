@@ -1,71 +1,287 @@
-import { BookOpen, Shield, Globe, Award } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import {
+  BookOpen,
+  Shield,
+  Globe,
+  Award,
+  Users,
+  Star,
+  Zap,
+  Target,
+  Heart,
+  TrendingUp,
+  CheckCircle2,
+} from 'lucide-react'
+import type { Metadata } from 'next'
+import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: 'About SkillBridge – Our Mission & Story',
+  description:
+    'Learn how SkillBridge is connecting students with expert tutors worldwide to make quality, personalized education accessible to everyone.',
+}
+
+/* ── Static data ─────────────────────────────────────────── */
+
+const stats = [
+  { icon: Users,     value: '500+',    label: 'Expert Tutors' },
+  { icon: BookOpen,  value: '12,000+', label: 'Sessions Completed' },
+  { icon: Star,      value: '4.8 ★',   label: 'Average Rating' },
+  { icon: Globe,     value: '40+',     label: 'Countries Reached' },
+]
+
+const values = [
+  {
+    icon: BookOpen,
+    color: 'text-emerald-400',
+    bg: 'bg-emerald-400/10',
+    border: 'border-emerald-400/20',
+    title: 'Curiosity First',
+    desc: 'We believe the best learning starts with genuine curiosity. Our platform nurtures exploration and lifelong growth.',
+  },
+  {
+    icon: Shield,
+    color: 'text-cyan-400',
+    bg: 'bg-cyan-400/10',
+    border: 'border-cyan-400/20',
+    title: 'Vetted Quality',
+    desc: 'Every tutor on SkillBridge undergoes strict background and skills checks so students always get the best.',
+  },
+  {
+    icon: Globe,
+    color: 'text-indigo-400',
+    bg: 'bg-indigo-400/10',
+    border: 'border-indigo-400/20',
+    title: 'Global Reach',
+    desc: 'Students and tutors from every continent — no borders, no barriers, just world-class knowledge-sharing.',
+  },
+  {
+    icon: Award,
+    color: 'text-amber-400',
+    bg: 'bg-amber-400/10',
+    border: 'border-amber-400/20',
+    title: 'Trust & Safety',
+    desc: 'Secure payments, authenticated reviews, and encrypted sessions put safety at the heart of everything.',
+  },
+]
+
+const team = [
+  { name: 'Asraf Hossain',   role: 'Founder & CEO',          avatar: 'AH', grad: 'from-indigo-500 to-purple-600' },
+  { name: 'Rima Khatun',     role: 'Head of Tutor Quality',  avatar: 'RK', grad: 'from-emerald-500 to-cyan-600'  },
+  { name: 'Tanvir Ahmed',    role: 'Lead Engineer',           avatar: 'TA', grad: 'from-pink-500 to-rose-600'     },
+  { name: 'Sadia Islam',     role: 'Design & UX',             avatar: 'SI', grad: 'from-amber-500 to-orange-600'  },
+]
+
+const timeline = [
+  { year: '2022', event: 'SkillBridge founded with a vision to democratise personalised tutoring.' },
+  { year: '2023', event: 'Launched beta platform with 50 hand-picked tutors across 5 subjects.' },
+  { year: '2024', event: 'Hit 5,000 sessions milestone and introduced live booking & payments.' },
+  { year: '2025', event: 'Expanded to 40+ countries with 500+ verified expert tutors.' },
+]
+
+/* ── Page component ──────────────────────────────────────── */
 
 export default function AboutPage() {
   return (
-    <div className='bg-slate-950 text-slate-100 min-h-screen py-20 px-6'>
-      <div className='max-w-4xl mx-auto space-y-16'>
-        {/* Header */}
-        <div className='text-center space-y-4'>
-          <span className='inline-block text-xs font-semibold tracking-widest uppercase bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full'>
-            Our Journey
+    <main className='bg-background text-foreground min-h-screen overflow-hidden page-fade-in transition-colors duration-300'>
+      {/* ── Hero ──────────────────────────────────────────── */}
+      <section className='relative py-28 px-6 text-center overflow-hidden border-b border-border'>
+        {/* Glow blobs */}
+        <div className='pointer-events-none absolute inset-0'>
+          <div className='about-blob about-blob-1' />
+          <div className='about-blob about-blob-2' />
+          <div className='about-blob about-blob-3' />
+        </div>
+        {/* Grid */}
+        <div className='pointer-events-none absolute inset-0 about-grid' />
+
+        <div className='relative z-10 max-w-3xl mx-auto space-y-5'>
+          <span className='about-badge'>
+            ✦ Our Story
           </span>
-          <h1 className='text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-450 bg-clip-text text-transparent'>
-            Bridging the gap between<br />Knowledge & Learners
+          <h1 className='text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.1]'>
+            Bridging the gap between{' '}
+            <span className='about-gradient-text'>Knowledge</span>
+            {' & '}
+            <span className='about-gradient-text-pink'>Learners</span>
           </h1>
-          <p className='text-slate-400 font-light max-w-xl mx-auto leading-relaxed text-sm md:text-base'>
-            SkillBridge was founded on a simple principle: high-quality, personalized education should be accessible instantly, anywhere in the world.
+          <p className='text-slate-400 text-lg max-w-xl mx-auto font-light leading-relaxed'>
+            SkillBridge was founded on a simple principle: high-quality,
+            personalised education should be accessible instantly, anywhere in the world.
           </p>
+          <div className='flex flex-wrap gap-3 justify-center pt-2'>
+            <Link href='/tutors' className='about-cta-primary'>
+              <Zap className='h-4 w-4' /> Find a Tutor
+            </Link>
+            <Link href='/register' className='about-cta-secondary'>
+              Join Free
+            </Link>
+          </div>
         </div>
+      </section>
 
-        {/* Vision & Mission */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-          <Card className='border-slate-800 bg-slate-900/30 backdrop-blur-sm'>
-            <CardContent className='p-8 space-y-3'>
-              <h2 className='text-xl font-bold text-white flex items-center gap-2'>
-                <span className='h-2 w-2 rounded-full bg-emerald-400' />
-                Our Mission
-              </h2>
-              <p className='text-sm text-slate-400 font-light leading-relaxed'>
-                To empower learners by matching them with verified expert mentors who can provide tailored 1-on-1 tutoring, helping students accelerate their understanding and reach their goals.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className='border-slate-800 bg-slate-900/30 backdrop-blur-sm'>
-            <CardContent className='p-8 space-y-3'>
-              <h2 className='text-xl font-bold text-white flex items-center gap-2'>
-                <span className='h-2 w-2 rounded-full bg-cyan-400' />
-                Our Vision
-              </h2>
-              <p className='text-sm text-slate-400 font-light leading-relaxed'>
-                A world where anybody can pick up a new skill, ace a tough exam, or master a programming language by instantly connecting with the perfect mentor who matches their learning style.
-              </p>
-            </CardContent>
-          </Card>
+      {/* ── Stats strip ───────────────────────────────────── */}
+      <section className='border-b border-white/5 bg-slate-900/40 backdrop-blur-sm'>
+        <div className='max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-px'>
+          {stats.map(({ icon: Icon, value, label }) => (
+            <div key={label} className='about-stat-card group'>
+              <Icon className='h-5 w-5 text-indigo-400 mb-2 group-hover:scale-110 transition-transform duration-300' />
+              <p className='text-2xl md:text-3xl font-black text-white'>{value}</p>
+              <p className='text-xs text-slate-500 mt-1 font-medium'>{label}</p>
+            </div>
+          ))}
         </div>
+      </section>
 
-        {/* Core Values */}
-        <div className='space-y-8'>
-          <h2 className='text-2xl font-bold text-center text-white'>Core Values We Stand By</h2>
-          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6'>
-            {[
-              { icon: <BookOpen className='h-5 w-5 text-emerald-400' />, title: 'Curiosity First', desc: 'Encouraging lifelong learning and exploration.' },
-              { icon: <Shield className='h-5 w-5 text-cyan-400' />, title: 'Vetted Quality', desc: 'All tutors undergo strict background and skill checks.' },
-              { icon: <Globe className='h-5 w-5 text-indigo-400' />, title: 'Global Reach', desc: 'Connecting students and experts from all continents.' },
-              { icon: <Award className='h-5 w-5 text-amber-400' />, title: 'Trust & Safety', desc: 'Secure booking systems and authenticated reviews.' }
-            ].map((v, i) => (
-              <div key={i} className='p-6 rounded-xl bg-slate-900/20 border border-white/5 space-y-3 text-center sm:text-left'>
-                <div className='h-10 w-10 rounded-lg bg-slate-900 border border-white/5 flex items-center justify-center mx-auto sm:mx-0'>
-                  {v.icon}
+      {/* ── Mission & Vision ──────────────────────────────── */}
+      <section className='max-w-5xl mx-auto py-24 px-6'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          {/* Mission */}
+          <div className='about-card about-card-emerald'>
+            <span className='about-card-badge about-card-badge-emerald'>
+              <Target className='h-3.5 w-3.5' /> Mission
+            </span>
+            <h2 className='text-xl font-bold text-white mt-4 mb-3'>
+              Empower Every Learner
+            </h2>
+            <p className='text-sm text-slate-400 font-light leading-relaxed'>
+              To empower students by matching them with verified expert mentors who
+              provide tailored 1-on-1 tutoring — helping them accelerate their
+              understanding and reach their goals faster than they ever thought possible.
+            </p>
+            <ul className='mt-4 space-y-2'>
+              {['Personalised learning paths', 'Instant session booking', 'Affordable pricing options'].map((item) => (
+                <li key={item} className='flex items-center gap-2 text-xs text-slate-400'>
+                  <CheckCircle2 className='h-3.5 w-3.5 text-emerald-400 flex-shrink-0' />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Vision */}
+          <div className='about-card about-card-indigo'>
+            <span className='about-card-badge about-card-badge-indigo'>
+              <TrendingUp className='h-3.5 w-3.5' /> Vision
+            </span>
+            <h2 className='text-xl font-bold text-white mt-4 mb-3'>
+              Education Without Borders
+            </h2>
+            <p className='text-sm text-slate-400 font-light leading-relaxed'>
+              A world where anyone can pick up a new skill, ace a tough exam, or master
+              a programming language by instantly connecting with the perfect mentor who
+              matches their learning style — regardless of where they live.
+            </p>
+            <ul className='mt-4 space-y-2'>
+              {['40+ countries served', '500+ expert tutors', 'Multi-language support'].map((item) => (
+                <li key={item} className='flex items-center gap-2 text-xs text-slate-400'>
+                  <CheckCircle2 className='h-3.5 w-3.5 text-indigo-400 flex-shrink-0' />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Core Values ───────────────────────────────────── */}
+      <section className='bg-slate-900/30 border-y border-white/5 py-24 px-6'>
+        <div className='max-w-5xl mx-auto'>
+          <div className='text-center mb-14'>
+            <span className='about-badge'>Core Values</span>
+            <h2 className='mt-4 text-3xl md:text-4xl font-extrabold text-white tracking-tight'>
+              What We Stand By
+            </h2>
+            <p className='text-slate-400 mt-3 font-light max-w-xl mx-auto text-sm'>
+              Every decision we make is guided by four principles that define the SkillBridge experience.
+            </p>
+          </div>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5'>
+            {values.map(({ icon: Icon, color, bg, border, title, desc }) => (
+              <div
+                key={title}
+                className={`about-value-card group border ${border}`}
+              >
+                <div className={`h-11 w-11 rounded-xl ${bg} ${border} border flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <Icon className={`h-5 w-5 ${color}`} />
                 </div>
-                <h3 className='font-semibold text-white text-sm'>{v.title}</h3>
-                <p className='text-xs text-slate-400 font-light leading-relaxed'>{v.desc}</p>
+                <h3 className='font-semibold text-white text-sm mb-2'>{title}</h3>
+                <p className='text-xs text-slate-400 font-light leading-relaxed'>{desc}</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+
+      {/* ── Timeline ──────────────────────────────────────── */}
+      <section className='max-w-3xl mx-auto py-24 px-6'>
+        <div className='text-center mb-14'>
+          <span className='about-badge'>Our Journey</span>
+          <h2 className='mt-4 text-3xl md:text-4xl font-extrabold text-white tracking-tight'>
+            How We Got Here
+          </h2>
+        </div>
+        <ol className='relative border-l border-indigo-500/30 space-y-10 pl-6'>
+          {timeline.map(({ year, event }, i) => (
+            <li key={year} className='group'>
+              <span className='absolute -left-[9px] flex h-4.5 w-4.5 items-center justify-center rounded-full bg-indigo-500/20 border border-indigo-500/40 ring-4 ring-slate-950'>
+                <span className='h-2 w-2 rounded-full bg-indigo-400' />
+              </span>
+              <time className='text-xs font-bold text-indigo-400 tracking-widest uppercase'>{year}</time>
+              <p className='mt-1 text-sm text-slate-300 font-light leading-relaxed group-hover:text-white transition-colors duration-200'>
+                {event}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* ── Team ──────────────────────────────────────────── */}
+      <section className='bg-slate-900/30 border-t border-white/5 py-24 px-6'>
+        <div className='max-w-5xl mx-auto'>
+          <div className='text-center mb-14'>
+            <span className='about-badge'>The People</span>
+            <h2 className='mt-4 text-3xl md:text-4xl font-extrabold text-white tracking-tight'>
+              Meet the Team
+            </h2>
+            <p className='text-slate-400 mt-3 font-light max-w-lg mx-auto text-sm'>
+              A small team with a big mission — passionate about reshaping how the world learns.
+            </p>
+          </div>
+          <div className='grid grid-cols-2 md:grid-cols-4 gap-5'>
+            {team.map(({ name, role, avatar, grad }) => (
+              <div key={name} className='about-team-card group'>
+                <div className={`h-16 w-16 rounded-2xl bg-gradient-to-br ${grad} flex items-center justify-center text-white text-xl font-bold shadow-lg mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  {avatar}
+                </div>
+                <p className='font-semibold text-white text-sm'>{name}</p>
+                <p className='text-xs text-slate-500 mt-0.5'>{role}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ───────────────────────────────────────────── */}
+      <section className='relative py-24 px-6 overflow-hidden'>
+        <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-indigo-600/10 via-purple-600/5 to-pink-600/10' />
+        <div className='relative z-10 max-w-2xl mx-auto text-center space-y-5'>
+          <Heart className='h-8 w-8 text-pink-400 mx-auto' />
+          <h2 className='text-3xl md:text-4xl font-extrabold text-white tracking-tight'>
+            Ready to start your journey?
+          </h2>
+          <p className='text-slate-400 font-light'>
+            Join thousands of students already unlocking new skills on SkillBridge.
+          </p>
+          <div className='flex flex-wrap gap-3 justify-center pt-2'>
+            <Link href='/register' className='about-cta-primary'>
+              <Zap className='h-4 w-4' /> Create Free Account
+            </Link>
+            <Link href='/tutors' className='about-cta-secondary'>
+              Browse Tutors
+            </Link>
+          </div>
+        </div>
+      </section>
+    </main>
   )
 }

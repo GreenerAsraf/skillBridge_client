@@ -85,7 +85,7 @@ export async function FeaturedTutors() {
                 <Link
                   key={tutor.id}
                   href={`/tutors/${tutor.id}`}
-                  className='group relative flex flex-col sm:flex-row gap-6 p-6 rounded-2xl bg-slate-900/40 border border-white/5 hover:border-slate-800 transition-all duration-300 hover:bg-slate-900/70'
+                  className='group relative flex flex-col sm:flex-row gap-6 p-6 rounded-2xl bg-card border border-border hover:border-border/70 transition-all duration-300 hover:bg-muted/30'
                 >
                   <div className='relative w-full sm:w-36 h-48 sm:h-36 rounded-xl overflow-hidden shrink-0 border border-white/10 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center'>
                     <span className='text-4xl font-bold text-white'>

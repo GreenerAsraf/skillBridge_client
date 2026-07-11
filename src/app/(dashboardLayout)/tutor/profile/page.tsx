@@ -40,6 +40,13 @@ export default function TutorProfilePage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [image, setImage] = useState('')
+
+  useEffect(() => {
+    if (user?.image) {
+      setImage(user.image as string)
+    }
+  }, [user])
 
   useEffect(() => {
     if (!user) return
@@ -75,6 +82,14 @@ export default function TutorProfilePage() {
           ...(categoryId ? { categoryId } : {}),
         }),
       })
+
+      if (image && image !== user?.image) {
+        await apiFetch('/api/users/profile', {
+          method: 'PATCH',
+          body: JSON.stringify({ image }),
+        })
+      }
+
       toast.success('Tutor profile saved!')
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to save profile'
@@ -120,6 +135,15 @@ export default function TutorProfilePage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSave} className='space-y-4'>
+            <div className='space-y-1'>
+              <label className='text-sm font-medium'>Profile Picture URL</label>
+              <Input
+                value={image}
+                onChange={(e) => setImage(e.target.value)}
+                placeholder='https://example.com/avatar.jpg'
+                className='bg-transparent'
+              />
+            </div>
             <div className='space-y-1'>
               <label className='text-sm font-medium'>Bio</label>
               <textarea

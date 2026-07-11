@@ -14,7 +14,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className='bg-slate-950 text-slate-100 min-h-screen py-20 px-6'>
+    <div className='bg-background text-foreground min-h-screen py-20 px-6 transition-colors duration-300'>
       <div className='max-w-4xl mx-auto space-y-12'>
         {/* Header */}
         <div className='text-center space-y-3'>

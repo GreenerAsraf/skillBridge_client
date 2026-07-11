@@ -5,6 +5,12 @@ const nextConfig: NextConfig = {
   // - Development: .env.local (http://localhost:5000)
   // - Production:  Vercel environment variables dashboard
   // Do NOT hardcode them here — next.config.ts env overrides ALL .env files.
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: '**' },
+      { protocol: 'http', hostname: 'localhost' },
+    ],
+  },
 };
 
 export default nextConfig;

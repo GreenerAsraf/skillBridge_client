@@ -23,17 +23,30 @@ const statusStyle: Record<string, string> = {
 export default function StudentDashboardPage() {
   const { user } = useAuth()
   const [bookings, setBookings] = useState<Booking[]>([])
+  const [stats, setStats] = useState({ pending: 0, confirmed: 0, completed: 0, cancelled: 0, total: 0 })
   const [loading, setLoading] = useState(true)
   const [payingId, setPayingId] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchStudentBookings()
-      .then(({ bookings, warning }) => {
+    // Fetch stats and bookings in parallel
+    Promise.all([
+      apiFetch<{ data: any }>('/api/bookings/stats').catch(() => ({ data: {} })),
+      fetchStudentBookings()
+    ])
+      .then(([statsRes, { bookings, warning }]) => {
+        const s = statsRes.data || {}
+        setStats({
+          pending: s.pending || 0,
+          confirmed: s.confirmed || 0,
+          completed: s.completed || 0,
+          cancelled: s.cancelled || 0,
+          total: (s.pending || 0) + (s.confirmed || 0) + (s.completed || 0) + (s.cancelled || 0)
+        })
         setBookings(bookings)
         if (warning) toast.warning(warning)
       })
       .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : 'Failed to load bookings'
+        const message = error instanceof Error ? error.message : 'Failed to load dashboard data'
         toast.error(message)
       })
       .finally(() => setLoading(false))
@@ -53,6 +66,7 @@ export default function StudentDashboardPage() {
         body: JSON.stringify({ status: 'CANCELLED' }),
       })
       setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status: 'CANCELLED' } : b)))
+      setStats((prev) => ({ ...prev, confirmed: prev.confirmed - 1, cancelled: prev.cancelled + 1 }))
       toast.success('Session cancelled.', { id: toastId })
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Cancel failed'
@@ -103,7 +117,7 @@ export default function StudentDashboardPage() {
             <CreditCard className='h-4 w-4 text-amber-500' />
           </CardHeader>
           <CardContent>
-            <p className='text-3xl font-bold'>{pending.length}</p>
+            <p className='text-3xl font-bold'>{stats.pending}</p>
           </CardContent>
         </Card>
         <Card>
@@ -112,7 +126,7 @@ export default function StudentDashboardPage() {
             <CalendarCheck className='h-4 w-4 text-blue-500' />
           </CardHeader>
           <CardContent>
-            <p className='text-3xl font-bold'>{upcoming.length}</p>
+            <p className='text-3xl font-bold'>{stats.confirmed}</p>
           </CardContent>
         </Card>
         <Card>
@@ -121,7 +135,7 @@ export default function StudentDashboardPage() {
             <CheckCircle className='h-4 w-4 text-green-500' />
           </CardHeader>
           <CardContent>
-            <p className='text-3xl font-bold'>{completed.length}</p>
+            <p className='text-3xl font-bold'>{stats.completed}</p>
           </CardContent>
         </Card>
         <Card>
@@ -130,7 +144,7 @@ export default function StudentDashboardPage() {
             <XCircle className='h-4 w-4 text-red-500' />
           </CardHeader>
           <CardContent>
-            <p className='text-3xl font-bold'>{cancelled.length}</p>
+            <p className='text-3xl font-bold'>{stats.cancelled}</p>
           </CardContent>
         </Card>
         <Card>
@@ -139,7 +153,7 @@ export default function StudentDashboardPage() {
             <Star className='h-4 w-4 text-amber-500' />
           </CardHeader>
           <CardContent>
-            <p className='text-3xl font-bold'>{bookings.length}</p>
+            <p className='text-3xl font-bold'>{stats.total}</p>
           </CardContent>
         </Card>
       </div>

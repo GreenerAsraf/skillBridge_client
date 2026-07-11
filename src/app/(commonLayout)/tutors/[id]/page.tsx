@@ -45,15 +45,20 @@ export default function TutorProfilePage() {
   const { user } = useAuth()
   const router = useRouter()
   const [tutor, setTutor] = useState<TutorProfile | null>(null)
+  const [relatedTutors, setRelatedTutors] = useState<TutorProfile[]>([])
   const [availability, setAvailability] = useState<Slot[]>([])
   const [loading, setLoading] = useState(true)
   const [booking, setBooking] = useState(false)
 
   useEffect(() => {
-    apiFetch<{ data: TutorProfile }>(`/api/tutors/${id}`)
-      .then((tutorRes) => {
+    Promise.all([
+      apiFetch<{ data: TutorProfile }>(`/api/tutors/${id}`),
+      apiFetch<{ data: TutorProfile[] }>(`/api/tutors/${id}/related`).catch(() => ({ data: [] }))
+    ])
+      .then(([tutorRes, relatedRes]) => {
         const tutorData = tutorRes.data
         setTutor(tutorData)
+        setRelatedTutors(relatedRes.data ?? [])
 
         // Parse backend availability to Slot format
         const dayMap: Record<string, string> = {
@@ -181,8 +186,13 @@ export default function TutorProfilePage() {
 
   return (
     <div className='max-w-4xl mx-auto py-10 px-4 space-y-6'>
+      {/* Banner / Gallery Header */}
+      <div className='relative h-48 w-full rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 overflow-hidden shadow-lg border border-white/10'>
+        <div className='absolute inset-0 bg-black/20 mix-blend-multiply'></div>
+      </div>
+
       {/* Header Profile Card */}
-      <Card>
+      <Card className='-mt-16 relative z-10 mx-4 border-white/10 bg-slate-900/80 backdrop-blur-md'>
         <CardContent className='p-6 flex flex-col sm:flex-row gap-6 items-start sm:items-center'>
           <div className='h-24 w-24 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-3xl shrink-0'>
             {(tutor.user?.name ?? '?')[0].toUpperCase()}
@@ -345,6 +355,34 @@ export default function TutorProfilePage() {
           </Card>
         </div>
       </div>
+
+      {/* Related Tutors */}
+      {relatedTutors.length > 0 && (
+        <div className='pt-10'>
+          <h2 className='text-2xl font-bold mb-6'>Similar Tutors</h2>
+          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6'>
+            {relatedTutors.map((rt) => (
+              <Card key={rt.id} className='bg-slate-900/60 border-white/10 hover:border-white/20 transition-all cursor-pointer' onClick={() => router.push(`/tutors/${rt.id}`)}>
+                <CardContent className='p-5 flex flex-col items-center text-center'>
+                  <div className='h-16 w-16 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xl mb-3'>
+                    {(rt.user?.name ?? '?')[0].toUpperCase()}
+                  </div>
+                  <h3 className='font-bold'>{rt.user?.name ?? 'Tutor'}</h3>
+                  <p className='text-xs text-muted-foreground mt-1'>
+                    {rt.category?.name ?? rt.categories?.[0]?.name ?? 'General'}
+                  </p>
+                  <div className='flex items-center gap-1 mt-3 text-sm'>
+                    <Star className='h-3.5 w-3.5 fill-yellow-400 stroke-yellow-400' />
+                    {rt.rating?.toFixed(1) ?? 'New'}
+                    <span className='mx-2 text-muted-foreground'>•</span>
+                    <span className='font-semibold'>${rt.hourlyPrice ?? 0}/hr</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

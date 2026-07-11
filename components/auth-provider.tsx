@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from 'react'
 import { signOut, useSession } from '@/lib/auth-client'
+import { SplashLoader } from '@/components/splash-loader'
 
 type SessionUser = {
   id: string
@@ -46,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
       }}
     >
+      <SplashLoader show={isPending} />
       {children}
     </AuthContext.Provider>
   )
