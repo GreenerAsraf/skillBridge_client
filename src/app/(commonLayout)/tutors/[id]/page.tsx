@@ -99,7 +99,15 @@ export default function TutorProfilePage() {
       const targetDayIndex = days.indexOf(day)
       const currentDayIndex = date.getDay()
       let daysUntilTarget = targetDayIndex - currentDayIndex
-      if (daysUntilTarget <= 0) daysUntilTarget += 7
+      
+      const [hours, minutes] = time.split(':')
+      const slotTime = new Date()
+      slotTime.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0)
+
+      // If the day passed, or it's today but the time has passed, book for next week
+      if (daysUntilTarget < 0 || (daysUntilTarget === 0 && slotTime < new Date())) {
+        daysUntilTarget += 7
+      }
       
       date.setDate(date.getDate() + daysUntilTarget)
       const yyyy = date.getFullYear()
@@ -107,7 +115,6 @@ export default function TutorProfilePage() {
       const dd = date.getDate().toString().padStart(2, '0')
       const dateStr = `${yyyy}-${mm}-${dd}`
 
-      const [hours, minutes] = time.split(':')
       const startHour = parseInt(hours, 10)
       const endHour = (startHour + 1).toString().padStart(2, '0')
       const endTimeStr = `${endHour}:${minutes}`

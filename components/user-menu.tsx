@@ -73,9 +73,18 @@ export function UserMenu() {
           aria-expanded={open}
         >
           {/* Avatar circle */}
-          <span className='flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-pink-500 text-[11px] font-bold text-white shadow-inner'>
-            {initials}
-          </span>
+          {user.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={user.image!}
+              alt={user.name}
+              className='h-7 w-7 rounded-full object-cover ring-2 ring-white/20'
+            />
+          ) : (
+            <span className='flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-pink-500 text-[11px] font-bold text-white shadow-inner'>
+              {initials}
+            </span>
+          )}
           <span className='hidden sm:block max-w-[110px] truncate text-sm font-medium text-white/90 group-hover:text-white transition-colors'>
             {user.name || user.email}
           </span>
@@ -91,9 +100,18 @@ export function UserMenu() {
           {/* User info header */}
           <div className='px-4 pt-4 pb-3 border-b border-white/10'>
             <div className='flex items-center gap-3'>
-              <span className='flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-pink-500 text-sm font-bold text-white shadow'>
-                {initials}
-              </span>
+              {user.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={user.image!}
+                  alt={user.name}
+                  className='h-10 w-10 flex-shrink-0 rounded-full object-cover ring-2 ring-white/20'
+                />
+              ) : (
+                <span className='flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-pink-500 text-sm font-bold text-white shadow'>
+                  {initials}
+                </span>
+              )}
               <div className='min-w-0'>
                 <p className='text-sm font-semibold text-white truncate'>{user.name || 'SkillBridge User'}</p>
                 <p className='text-xs text-slate-400 truncate'>{user.email}</p>

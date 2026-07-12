@@ -32,7 +32,7 @@ async function loadTutorProfile(userEmail: string): Promise<TutorProfile | null>
 }
 
 export default function TutorProfilePage() {
-  const { user } = useAuth()
+  const { user, refetch } = useAuth()
   const [bio, setBio] = useState('')
   const [subjects, setSubjects] = useState('')
   const [hourlyRate, setHourlyRate] = useState('')
@@ -91,6 +91,7 @@ export default function TutorProfilePage() {
       }
 
       toast.success('Tutor profile saved!')
+      await refetch()
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to save profile'
       toast.error(message)

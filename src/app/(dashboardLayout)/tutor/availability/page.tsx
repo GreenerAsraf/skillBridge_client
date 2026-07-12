@@ -1,177 +1,218 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useAuth } from '@/components/auth-provider'
-import { apiFetch } from '@/lib/api'
+import { useEffect, useState } from 'react'
+import { Plus, Trash2, Save, Clock, AlertCircle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { apiFetch } from '@/lib/api'
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-const HOURS = Array.from({ length: 13 }, (_, i) => `${(i + 8).toString().padStart(2, '0')}:00`)
+type DayEnum = 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN'
+const DAYS: { value: DayEnum; label: string }[] = [
+  { value: 'MON', label: 'Monday' },
+  { value: 'TUE', label: 'Tuesday' },
+  { value: 'WED', label: 'Wednesday' },
+  { value: 'THU', label: 'Thursday' },
+  { value: 'FRI', label: 'Friday' },
+  { value: 'SAT', label: 'Saturday' },
+  { value: 'SUN', label: 'Sunday' },
+]
 
-type Slot = { day: string; time: string }
+type TimeSlot = {
+  day: DayEnum
+  startTime: string // "HH:mm"
+  endTime: string // "HH:mm"
+}
 
-export default function TutorAvailabilityPage() {
-  const { user } = useAuth()
-  const [slots, setSlots] = useState<Slot[]>([])
+// Helper to convert Prisma DateTime to "HH:mm"
+function extractTime(isoString: string) {
+  const date = new Date(isoString)
+  const h = date.getUTCHours().toString().padStart(2, '0')
+  const m = date.getUTCMinutes().toString().padStart(2, '0')
+  return `${h}:${m}`
+}
+
+// Helper to convert "HH:mm" to a dummy ISO string for Prisma DateTime
+function buildIsoTime(timeStr: string) {
+  const [h, m] = timeStr.split(':')
+  // Using 1970-01-01 as the dummy date base for time slots
+  return `1970-01-01T${h.padStart(2, '0')}:${m.padStart(2, '0')}:00.000Z`
+}
+
+export default function AvailabilityPage() {
+  const [slots, setSlots] = useState<TimeSlot[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    if (!user) return
-    apiFetch<{ data: any[] }>('/api/tutors')
+    // Fetch current profile to get existing availability
+    apiFetch<{ data: { availability?: Array<{ day: DayEnum; startTime: string; endTime: string }> } }>('/api/tutors/me')
       .then((res) => {
-        const myProfile = res.data?.find((t) => t.user?.email === user.email)
-        if (myProfile && myProfile.availability) {
-          const dayMap: Record<string, string> = {
-            MON: 'Monday', TUE: 'Tuesday', WED: 'Wednesday', THU: 'Thursday', FRI: 'Friday', SAT: 'Saturday', SUN: 'Sunday'
-          }
-          const loadedSlots = myProfile.availability.map((av: any) => {
-            const start = new Date(av.startTime)
-            const h = start.getUTCHours().toString().padStart(2, '0')
-            return {
-              day: dayMap[av.day] || av.day,
-              time: `${h}:00`
-            }
-          })
-          setSlots(loadedSlots)
+        if (res.data?.availability) {
+          const parsed = res.data.availability.map((av) => ({
+            day: av.day,
+            startTime: extractTime(av.startTime),
+            endTime: extractTime(av.endTime),
+          }))
+          setSlots(parsed)
         }
       })
-      .catch(() => {})
+      .catch((err) => toast.error('Failed to load availability'))
       .finally(() => setLoading(false))
-  }, [user])
+  }, [])
 
-  function toggleSlot(day: string, time: string) {
-    const key = `${day}:${time}`
-    setSlots((prev) => {
-      const exists = prev.some((s) => `${s.day}:${s.time}` === key)
-      return exists ? prev.filter((s) => `${s.day}:${s.time}` !== key) : [...prev, { day, time }]
-    })
+  function handleAddSlot(day: DayEnum) {
+    setSlots((prev) => [...prev, { day, startTime: '09:00', endTime: '17:00' }])
   }
 
-  function isSelected(day: string, time: string) {
-    return slots.some((s) => s.day === day && s.time === time)
+  function handleRemoveSlot(index: number) {
+    setSlots((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  function handleSlotChange(index: number, field: 'startTime' | 'endTime', value: string) {
+    setSlots((prev) =>
+      prev.map((slot, i) => (i === index ? { ...slot, [field]: value } : slot))
+    )
   }
 
   async function handleSave() {
     setSaving(true)
+    const toastId = toast.loading('Saving schedule...')
+
+    // Format for backend
+    const payload = slots.map((s) => ({
+      day: s.day,
+      startTime: buildIsoTime(s.startTime),
+      endTime: buildIsoTime(s.endTime),
+    }))
+
     try {
-      const dayMap: Record<string, string> = {
-        'Monday': 'MON',
-        'Tuesday': 'TUE',
-        'Wednesday': 'WED',
-        'Thursday': 'THU',
-        'Friday': 'FRI',
-        'Saturday': 'SAT',
-        'Sunday': 'SUN'
+      const res = await apiFetch<{ success: boolean; message?: string }>('/api/tutor/availability', {
+        method: 'PATCH',
+        body: JSON.stringify({ availabilities: payload }),
+      })
+
+      if (res.success) {
+        toast.success('Availability schedule updated successfully!', { id: toastId })
+      } else {
+        toast.error(res.message || 'Failed to update schedule', { id: toastId })
       }
-
-      const availabilities = slots.map((slot) => {
-        const [hours, minutes] = slot.time.split(':')
-        // Use a fixed date to prevent timezone shift issues on the backend 
-        // if only time is relevant
-        const startDate = new Date('2024-01-01T00:00:00Z')
-        startDate.setUTCHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0)
-        
-        const endDate = new Date(startDate)
-        endDate.setUTCHours(startDate.getUTCHours() + 1)
-
-        return {
-          day: dayMap[slot.day],
-          startTime: startDate.toISOString(),
-          endTime: endDate.toISOString(),
-        }
-      })
-
-      await apiFetch('/api/tutor/availability', { 
-        method: 'PUT', 
-        body: JSON.stringify({ availabilities }) 
-      })
-      toast.success('Availability saved!')
     } catch (err: any) {
-      toast.error(err.message ?? 'Failed to save availability')
+      toast.error(err.message || 'An error occurred while saving', { id: toastId })
     } finally {
       setSaving(false)
     }
   }
 
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <span className="h-8 w-8 animate-spin rounded-full border-4 border-slate-700 border-t-indigo-500" />
+      </div>
+    )
+  }
+
   return (
-    <div className='max-w-6xl space-y-8 py-4 animate-fade-in'>
-      <div className='flex flex-col gap-1.5'>
-        <h1 className='text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent'>Set Availability</h1>
-        <p className='text-sm text-slate-400 font-light'>Manage your weekly slots. Click on any block to toggle availability, then save your changes.</p>
+    <div className="space-y-6 max-w-4xl">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Manage Availability</h1>
+        <p className="text-slate-400 mt-2">
+          Define your weekly teaching schedule. Students can only book you during these slots.
+        </p>
       </div>
 
-      <Card className='border-slate-800 bg-slate-950/40 backdrop-blur-md shadow-2xl'>
-        <CardHeader className='border-b border-slate-900 pb-6'>
-          <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
-            <div>
-              <CardTitle className='text-lg font-bold text-white'>Weekly Schedule</CardTitle>
-              <CardDescription className='text-slate-400 text-xs font-light mt-0.5'>Select the hours you are open for tutoring sessions.</CardDescription>
-            </div>
-            <div className='flex items-center gap-2.5 bg-slate-900/60 border border-slate-800 px-4 py-2 rounded-xl'>
-              <span className='w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse' />
-              <span className='text-xs font-semibold text-slate-350'>{slots.length} active slot(s)</span>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className='pt-6 overflow-x-auto'>
-          {loading ? (
-            <div className='flex flex-col items-center justify-center py-20 gap-3'>
-              <div className='w-8 h-8 rounded-full border-2 border-slate-800 border-t-emerald-500 animate-spin' />
-              <p className='text-sm text-slate-450 animate-pulse font-light'>
-                Retrieving schedule...
-              </p>
-            </div>
-          ) : (
-            <table className='text-xs border-collapse w-full min-w-[700px]'>
-              <thead>
-                <tr>
-                  <th className='p-3 text-left text-slate-400 font-semibold w-24 border-b border-slate-900'>Time</th>
-                  {DAYS.map((d) => (
-                    <th key={d} className='p-3 text-center font-bold text-slate-300 border-b border-slate-900'>{d.slice(0, 3)}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className='divide-y divide-slate-900/40'>
-                {HOURS.map((time) => (
-                  <tr key={time} className='hover:bg-slate-900/10 transition-colors duration-150'>
-                    <td className='p-3 font-medium text-slate-450 border-r border-slate-900/40'>{time}</td>
-                    {DAYS.map((day) => {
-                      const selected = isSelected(day, time)
-                      return (
-                        <td key={day} className='p-1.5 text-center'>
-                          <button
-                            onClick={() => toggleSlot(day, time)}
-                            className={`w-full h-9 rounded-lg text-[11px] font-bold transition-all duration-200 border flex items-center justify-center ${
-                              selected
-                                ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 border-0 shadow-md shadow-emerald-500/10 scale-[1.02]'
-                                : 'border-slate-800 hover:border-slate-700 bg-slate-900/20 hover:bg-slate-900/50 text-slate-400 hover:text-slate-200'
-                            }`}
-                          >
-                            {selected ? '✓' : ''}
-                          </button>
-                        </td>
-                      )
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </CardContent>
-      </Card>
-
-      <div className='flex items-center gap-4 pt-2'>
-        <Button 
-          onClick={handleSave} 
-          disabled={saving || loading}
-          className='bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold px-6 py-5 rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-emerald-500/15 disabled:opacity-50 disabled:pointer-events-none border-0'
+      <div className="flex justify-end">
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg"
         >
-          {saving ? 'Saving changes…' : 'Save Availability'}
+          {saving ? (
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white mr-2" />
+          ) : (
+            <Save className="h-4 w-4 mr-2" />
+          )}
+          Save Schedule
         </Button>
       </div>
+
+      <div className="space-y-6">
+        {DAYS.map((day) => {
+          const daySlots = slots
+            .map((slot, idx) => ({ ...slot, originalIndex: idx }))
+            .filter((s) => s.day === day.value)
+
+          return (
+            <Card key={day.value} className="border-slate-800 bg-slate-900/50 backdrop-blur-sm overflow-hidden">
+              <div className="flex flex-col sm:flex-row">
+                {/* Day Header */}
+                <div className="w-full sm:w-48 bg-slate-900 p-4 border-r border-slate-800 flex items-center justify-between sm:justify-start gap-3">
+                  <h3 className="font-semibold text-slate-200">{day.label}</h3>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10"
+                    onClick={() => handleAddSlot(day.value)}
+                    title="Add Slot"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Slots Area */}
+                <div className="flex-1 p-4 min-h-[4rem] flex flex-col justify-center">
+                  {daySlots.length === 0 ? (
+                    <p className="text-sm text-slate-500 font-light flex items-center gap-2">
+                      <Clock className="h-4 w-4 opacity-50" /> Unavailable
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      {daySlots.map((slot) => (
+                        <div key={slot.originalIndex} className="flex items-center gap-3">
+                          <input
+                            type="time"
+                            value={slot.startTime}
+                            onChange={(e) => handleSlotChange(slot.originalIndex, 'startTime', e.target.value)}
+                            className="bg-slate-950 border border-slate-800 rounded-md px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
+                          />
+                          <span className="text-slate-500 text-sm">to</span>
+                          <input
+                            type="time"
+                            value={slot.endTime}
+                            onChange={(e) => handleSlotChange(slot.originalIndex, 'endTime', e.target.value)}
+                            className="bg-slate-950 border border-slate-800 rounded-md px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 ml-2"
+                            onClick={() => handleRemoveSlot(slot.originalIndex)}
+                            title="Remove Slot"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Card>
+          )
+        })}
+      </div>
+
+      <Card className="border-amber-500/20 bg-amber-500/5">
+        <CardContent className="p-4 flex gap-3 text-amber-200">
+          <AlertCircle className="h-5 w-5 shrink-0 text-amber-500" />
+          <div className="text-sm">
+            <p className="font-semibold text-amber-500">Note on Availability</p>
+            <p className="font-light mt-1 text-amber-200/80">
+              All times should be entered in UTC. We are actively working on automatic timezone conversion in a future update.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

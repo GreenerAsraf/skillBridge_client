@@ -49,7 +49,13 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       role: 'STUDENT' as 'STUDENT' | 'TUTOR'
     },
     validators: {
-      onSubmit: formSchema
+      onSubmit: ({ value }: { value: { name: string; email: string; image: string; password: string; confirmPassword: string; role: 'STUDENT' | 'TUTOR' } }) => {
+        const result = formSchema.safeParse(value)
+        if (!result.success) {
+          return result.error.issues.map((e: { message: string }) => e.message).join(', ')
+        }
+        return undefined
+      },
     },
     onSubmit: async ({ value }) => {
       const toastId = toast.loading('Creating account...')

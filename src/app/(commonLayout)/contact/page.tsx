@@ -5,12 +5,42 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 
+import { useState } from 'react'
+import { apiFetch } from '@/lib/api'
+
 export default function ContactPage() {
-  function handleSubmit(e: React.FormEvent) {
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    toast.success('Message sent! We will get back to you within 24 hours.')
     const form = e.target as HTMLFormElement
-    form.reset()
+    const formData = new FormData(form)
+
+    const firstName = formData.get('firstName') as string
+    const lastName = formData.get('lastName') as string
+    const email = formData.get('email') as string
+    const message = formData.get('message') as string
+
+    const name = `${firstName} ${lastName}`.trim()
+
+    try {
+      setLoading(true)
+      const res = await apiFetch<{ success: boolean; message?: string }>('/api/contact', {
+        method: 'POST',
+        body: JSON.stringify({ name, email, message }),
+      })
+
+      if (res.success) {
+        toast.success('Message sent! We will get back to you within 24 hours.')
+        form.reset()
+      } else {
+        toast.error(res.message || 'Failed to send message.')
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Something went wrong, please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -62,6 +92,7 @@ export default function ContactPage() {
                       <input
                         required
                         type='text'
+                        name='firstName'
                         placeholder='John'
                         className='w-full text-sm px-4 py-2.5 rounded-lg border border-slate-800 bg-slate-950/60 focus:outline-none focus:border-cyan-500 transition-colors placeholder:text-slate-600'
                       />
@@ -71,6 +102,7 @@ export default function ContactPage() {
                       <input
                         required
                         type='text'
+                        name='lastName'
                         placeholder='Doe'
                         className='w-full text-sm px-4 py-2.5 rounded-lg border border-slate-800 bg-slate-950/60 focus:outline-none focus:border-cyan-500 transition-colors placeholder:text-slate-600'
                       />
@@ -82,6 +114,7 @@ export default function ContactPage() {
                     <input
                       required
                       type='email'
+                      name='email'
                       placeholder='john@example.com'
                       className='w-full text-sm px-4 py-2.5 rounded-lg border border-slate-800 bg-slate-950/60 focus:outline-none focus:border-cyan-500 transition-colors placeholder:text-slate-600'
                     />
@@ -91,15 +124,22 @@ export default function ContactPage() {
                     <label className='text-xs font-semibold text-slate-350'>Message</label>
                     <textarea
                       required
+                      name='message'
                       rows={4}
                       placeholder='How can we help you?'
                       className='w-full text-sm px-4 py-2.5 rounded-lg border border-slate-800 bg-slate-950/60 focus:outline-none focus:border-cyan-500 transition-colors placeholder:text-slate-600 resize-none'
                     />
                   </div>
 
-                  <Button type='submit' className='w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-bold py-3 rounded-lg flex items-center justify-center gap-1.5 border-0'>
-                    <Send className='h-4 w-4' />
-                    <span>Send Message</span>
+                  <Button disabled={loading} type='submit' className='w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-bold py-3 rounded-lg flex items-center justify-center gap-1.5 border-0'>
+                    {loading ? (
+                      <span className='h-4 w-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin' />
+                    ) : (
+                      <>
+                        <Send className='h-4 w-4' />
+                        <span>Send Message</span>
+                      </>
+                    )}
                   </Button>
                 </form>
               </CardContent>

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { CalendarCheck, Clock, CheckCircle, XCircle, Star, CreditCard } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
+import { ReviewModal } from '@/components/review-modal'
 
 type Booking = StoredBooking
 
@@ -26,6 +27,7 @@ export default function StudentDashboardPage() {
   const [stats, setStats] = useState({ pending: 0, confirmed: 0, completed: 0, cancelled: 0, total: 0 })
   const [loading, setLoading] = useState(true)
   const [payingId, setPayingId] = useState<string | null>(null)
+  const [reviewingBooking, setReviewingBooking] = useState<Booking | null>(null)
 
   useEffect(() => {
     // Fetch stats and bookings in parallel
@@ -281,6 +283,16 @@ export default function StudentDashboardPage() {
                         Reviewed
                       </span>
                     )}
+                    {b.status === 'COMPLETED' && !b.review && (
+                      <Button
+                        size='sm'
+                        variant='outline'
+                        className='text-amber-500 border-amber-200 hover:bg-amber-500/10 hover:text-amber-400 text-[11px] h-7 px-2.5 shadow-none'
+                        onClick={() => setReviewingBooking(b)}
+                      >
+                        Leave Review
+                      </Button>
+                    )}
                   </div>
                 </li>
               ))}
@@ -295,6 +307,20 @@ export default function StudentDashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      {reviewingBooking && (
+        <ReviewModal
+          bookingId={reviewingBooking.id}
+          tutorName={reviewingBooking.tutor?.user?.name ?? 'Tutor'}
+          onClose={() => setReviewingBooking(null)}
+          onSuccess={(newReview: any) => {
+            setBookings((prev) =>
+              prev.map((b) => (b.id === reviewingBooking.id ? { ...b, review: newReview } : b))
+            )
+            setReviewingBooking(null)
+          }}
+        />
+      )}
     </div>
   )
 }

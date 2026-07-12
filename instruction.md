@@ -653,3 +653,30 @@ npm install multer             # File upload (if not using cloud)
 
 > [!TIP]
 > Start with **BE-E1** (Stats API) + **FE-M1** (Live home stats) as your very first task — it gives you the pattern for all future API integration work and immediately makes the homepage production-ready.
+
+
+
+remaining for night 
+🟢 Easy Tasks (Quick Wins)
+[FE-E5 / BE-E2] Contact Page & API Integration: The frontend contact/page.tsx has a beautiful UI, but its handleSubmit is currently a mock that just shows a success toast.
+Remaining: Create the Contact model in Prisma, build the POST /api/contact backend endpoint, and connect the frontend form to it.
+[BE-E5] Environment Variable Validation:
+Remaining: Add zod schema validation in the backend src/config/index.ts to fail fast if required environment variables are missing at startup.
+🟡 Medium Tasks
+[FE-M5 / BE-M2] Avatar / Image Upload (True Upload): While we successfully added the ability to save an image URL to the profile today, the instruction specifies a true file upload requirement.
+Remaining: Add multer (or Cloudinary/UploadThing) on the backend to accept physical image files (POST /api/users/avatar) instead of just string URLs.
+[FE-M4 (Partial)] Tutor Detail Page:
+Remaining: The instruction mentions adding an image gallery/slider or a banner, and integrating the related tutors section (the backend API BE-M6 for related tutors exists, but needs to be hooked up on the frontend).
+🔴 Challenging Tasks (Core Business Logic)
+[FE-C3 / BE-C2] End-to-End Booking & Payment Flow:
+Remaining: Ensure the booking form uses a date/time picker that respects the tutor's actual availability slots. The SSLCommerz IPN callback on the backend needs an audit to guarantee it robustly updates both Payment.status and Booking.status without allowing double payments.
+[FE-C4 / BE-C1] Review & Rating System:
+Remaining: The backend needs logic in POST /api/reviews to enforce that a student can only leave a review if their booking status is COMPLETED, and ensure they can only leave one review per booking. The frontend needs a UI to submit this star rating and comment after a session.
+[FE-C5] Tutor Dashboard - Manage Availability:
+Remaining: The /tutor/availability/ route needs a weekly schedule grid (Day × TimeSlot) UI so tutors can easily add/remove the times they are available to teach.
+[FE-C1] Dark Mode Consistency:
+Remaining: While you have a theme toggle, many components (like the new carousel and about page) currently use hardcoded dark colors (e.g., bg-slate-950, text-white). These need a pass to use CSS variables or Tailwind's dark: modifier so they look good in Light Mode.
+[FE-C6 / BE-C5] Production Readiness & Optimization:
+Remaining:
+Frontend: Add next/image tags, lazy loading, and remove unnecessary 'use client' directives to leverage React Server Components.
+Backend: Install and configure helmet (security headers), express-rate-limit (brute-force protection), and compression middleware in app.ts

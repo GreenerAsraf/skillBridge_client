@@ -113,16 +113,16 @@ export default function CategoriesSection() {
   }, [])
 
   return (
-    <section className='py-24 px-6 border-t border-white/5 bg-slate-950/80'>
+    <section className='py-24 px-6 border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-950/80'>
       <div className='max-w-5xl mx-auto'>
         <div className='text-center max-w-2xl mx-auto mb-14'>
-          <span className='inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full mb-4'>
+          <span className='inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded-full mb-4'>
             📚 Browse by Subject
           </span>
-          <h2 className='text-3xl md:text-4xl font-extrabold text-white tracking-tight'>
+          <h2 className='text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight'>
             Explore Skill Categories
           </h2>
-          <p className='text-slate-400 mt-3 font-light'>
+          <p className='text-slate-600 dark:text-slate-400 mt-3 font-light'>
             From music to mathematics — find experts in every domain.
           </p>
         </div>
@@ -163,7 +163,7 @@ export default function CategoriesSection() {
                     />
                   </div>
                   <div>
-                    <p className='font-semibold text-sm text-slate-100 group-hover:text-white transition-colors'>
+                    <p className='font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-black dark:group-hover:text-white transition-colors'>
                       {cat.name}
                     </p>
                     {cat._count?.tutorProfiles != null && (
@@ -182,7 +182,7 @@ export default function CategoriesSection() {
         <div className='text-center mt-10'>
           <Link
             href='/tutors'
-            className='inline-flex items-center gap-2 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors group'
+            className='inline-flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors group'
           >
             View all tutors
             <span className='transition-transform duration-200 group-hover:translate-x-1'>

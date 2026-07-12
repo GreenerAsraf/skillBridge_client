@@ -7,6 +7,7 @@ import CategoriesSection from '@/components/home/categories-section'
 import TestimonialsSection from '@/components/home/testimonials-section'
 import FaqSection from '@/components/home/faq-section'
 import StatsSection from '@/components/home/stats-section'
+import ImageCarousel from '@/components/home/image-carousel'
 
 export default function HomePage() {
   return (
@@ -40,6 +41,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Image Carousel */}
+      <ImageCarousel />
 
       {/* Stats strip — live from backend */}
       <StatsSection />
