@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { Suspense, useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { apiFetch } from '@/lib/api'
 import { Star, Search, SlidersHorizontal, Filter, ChevronLeft, ChevronRight, X } from 'lucide-react'
@@ -25,7 +26,10 @@ type SortOption = 'default' | 'rating-desc' | 'price-asc' | 'price-desc'
 
 const PAGE_SIZE = 9
 
-export default function BrowseTutorsPage() {
+/**
+ * Inner component that reads URL search params — must be wrapped in <Suspense>.
+ */
+function BrowseTutorsInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -307,6 +311,34 @@ export default function BrowseTutorsPage() {
   )
 }
 
+/**
+ * Page wrapper — useSearchParams() inside BrowseTutorsInner requires Suspense.
+ * This satisfies the Next.js static prerender requirement.
+ */
+export default function BrowseTutorsPage() {
+  return (
+    <Suspense fallback={
+      <div className='min-h-screen bg-background'>
+        <div className='border-b border-border bg-slate-100 dark:bg-muted/30 py-10 px-6'>
+          <div className='max-w-5xl mx-auto'>
+            <div className='h-9 w-48 rounded-lg bg-muted animate-pulse mb-2' />
+            <div className='h-4 w-72 rounded bg-muted animate-pulse' />
+          </div>
+        </div>
+        <div className='max-w-5xl mx-auto py-8 px-6'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className='h-52 rounded-xl bg-muted animate-pulse' />
+            ))}
+          </div>
+        </div>
+      </div>
+    }>
+      <BrowseTutorsInner />
+    </Suspense>
+  )
+}
+
 function Chip({
   label,
   onRemove,
@@ -341,7 +373,14 @@ function TutorCard({ tutor: t }: { tutor: Tutor }) {
       {/* Avatar + name */}
       <div className='flex items-center gap-3'>
         {t.user?.image ? (
-          <img src={t.user.image} alt={t.user?.name ?? 'Tutor'} className='h-10 w-10 rounded-full object-cover shadow-md group-hover:scale-110 transition-transform duration-300' />
+          <Image
+            src={t.user.image}
+            alt={t.user?.name ?? 'Tutor'}
+            width={40}
+            height={40}
+            loading='lazy'
+            className='h-10 w-10 rounded-full object-cover shadow-md group-hover:scale-110 transition-transform duration-300'
+          />
         ) : (
           <div className='h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold flex items-center justify-center text-sm shadow-md group-hover:scale-110 transition-transform duration-300'>
             {(t.user?.name ?? '?')[0].toUpperCase()}

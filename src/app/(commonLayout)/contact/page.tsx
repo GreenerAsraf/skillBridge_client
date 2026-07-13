@@ -51,10 +51,10 @@ export default function ContactPage() {
           <span className='inline-block text-xs font-semibold tracking-widest uppercase bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 px-3 py-1 rounded-full'>
             Contact Support
           </span>
-          <h1 className='text-4xl font-extrabold tracking-tight text-white'>
+          <h1 className='text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white'>
             Get in touch with us
           </h1>
-          <p className='text-slate-400 font-light max-w-md mx-auto text-sm'>
+          <p className='text-slate-600 dark:text-slate-400 font-light max-w-md mx-auto text-sm'>
             Have questions about booking? Or need help with your tutor account? Drop us a message below.
           </p>
         </div>
@@ -67,14 +67,14 @@ export default function ContactPage() {
               { icon: <Phone className='h-4 w-4 text-cyan-400' />, title: 'Call Support', desc: '+1 (555) 304-4050' },
               { icon: <Clock className='h-4 w-4 text-indigo-400' />, title: 'Operation Hours', desc: 'Mon - Fri, 9 AM - 6 PM' }
             ].map((item, idx) => (
-              <Card key={idx} className='border-slate-800 bg-slate-900/30 backdrop-blur-sm'>
+              <Card key={idx} className='border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 backdrop-blur-sm'>
                 <CardContent className='p-5 flex items-start gap-4'>
-                  <div className='h-9 w-9 rounded-lg bg-slate-900 border border-white/5 flex items-center justify-center shrink-0'>
+                  <div className='h-9 w-9 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 flex items-center justify-center shrink-0'>
                     {item.icon}
                   </div>
                   <div>
-                    <h3 className='font-semibold text-white text-xs'>{item.title}</h3>
-                    <p className='text-xs text-slate-400 mt-0.5 font-light'>{item.desc}</p>
+                    <h3 className='font-semibold text-slate-900 dark:text-white text-xs'>{item.title}</h3>
+                    <p className='text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-light'>{item.desc}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -83,51 +83,51 @@ export default function ContactPage() {
 
           {/* Form */}
           <div className='md:col-span-2'>
-            <Card className='border-slate-800 bg-slate-900/30 backdrop-blur-sm'>
+            <Card className='border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 backdrop-blur-sm'>
               <CardContent className='p-8'>
                 <form onSubmit={handleSubmit} className='space-y-5'>
                   <div className='grid grid-cols-2 gap-4'>
                     <div className='space-y-1.5'>
-                      <label className='text-xs font-semibold text-slate-350'>First Name</label>
+                      <label className='text-xs font-semibold text-slate-700 dark:text-slate-300'>First Name</label>
                       <input
                         required
                         type='text'
                         name='firstName'
                         placeholder='John'
-                        className='w-full text-sm px-4 py-2.5 rounded-lg border border-slate-800 bg-slate-950/60 focus:outline-none focus:border-cyan-500 transition-colors placeholder:text-slate-600'
+                        className='w-full text-sm px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 focus:outline-none focus:border-cyan-500 transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-600 text-slate-900 dark:text-white'
                       />
                     </div>
                     <div className='space-y-1.5'>
-                      <label className='text-xs font-semibold text-slate-350'>Last Name</label>
+                      <label className='text-xs font-semibold text-slate-700 dark:text-slate-300'>Last Name</label>
                       <input
                         required
                         type='text'
                         name='lastName'
                         placeholder='Doe'
-                        className='w-full text-sm px-4 py-2.5 rounded-lg border border-slate-800 bg-slate-950/60 focus:outline-none focus:border-cyan-500 transition-colors placeholder:text-slate-600'
+                        className='w-full text-sm px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 focus:outline-none focus:border-cyan-500 transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-600 text-slate-900 dark:text-white'
                       />
                     </div>
                   </div>
 
                   <div className='space-y-1.5'>
-                    <label className='text-xs font-semibold text-slate-350'>Email Address</label>
+                    <label className='text-xs font-semibold text-slate-700 dark:text-slate-300'>Email Address</label>
                     <input
                       required
                       type='email'
                       name='email'
                       placeholder='john@example.com'
-                      className='w-full text-sm px-4 py-2.5 rounded-lg border border-slate-800 bg-slate-950/60 focus:outline-none focus:border-cyan-500 transition-colors placeholder:text-slate-600'
+                      className='w-full text-sm px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 focus:outline-none focus:border-cyan-500 transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-600 text-slate-900 dark:text-white'
                     />
                   </div>
 
                   <div className='space-y-1.5'>
-                    <label className='text-xs font-semibold text-slate-350'>Message</label>
+                    <label className='text-xs font-semibold text-slate-700 dark:text-slate-300'>Message</label>
                     <textarea
                       required
                       name='message'
                       rows={4}
                       placeholder='How can we help you?'
-                      className='w-full text-sm px-4 py-2.5 rounded-lg border border-slate-800 bg-slate-950/60 focus:outline-none focus:border-cyan-500 transition-colors placeholder:text-slate-600 resize-none'
+                      className='w-full text-sm px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 focus:outline-none focus:border-cyan-500 transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-600 text-slate-900 dark:text-white resize-none'
                     />
                   </div>
 

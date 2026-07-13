@@ -498,9 +498,14 @@
 
 .about-grid {
   background-image:
+    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.dark .about-grid {
+  background-image:
     linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 32px 32px;
 }
 
 .about-badge {
@@ -510,11 +515,16 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   background: rgba(99, 102, 241, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  color: #6366f1;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   margin-bottom: 1rem;
+}
+.dark .about-badge {
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.2);
 }
 
 .about-gradient-text {
@@ -534,8 +544,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #ffffff;
-  color: #0f172a;
+  background: #0f172a;
+  color: #ffffff;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   border-radius: 0.75rem;
@@ -543,6 +553,13 @@
 }
 .about-cta-primary:hover {
   transform: scale(1.02);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+.dark .about-cta-primary {
+  background: #ffffff;
+  color: #0f172a;
+}
+.dark .about-cta-primary:hover {
   box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2);
 }
 
@@ -550,52 +567,76 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #0f172a;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   border-radius: 0.75rem;
   transition: all 0.2s ease;
 }
 .about-cta-secondary:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+.dark .about-cta-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+.dark .about-cta-secondary:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
 .about-stat-card {
   padding: 2rem 1rem;
   text-align: center;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: background 0.3s ease;
 }
 .about-stat-card:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(0, 0, 0, 0.02);
 }
 .about-stat-card:last-child {
   border-right: none;
 }
+.dark .about-stat-card {
+  border-right-color: rgba(255, 255, 255, 0.05);
+}
+.dark .about-stat-card:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
 @media (max-width: 768px) {
   .about-stat-card:nth-child(2) { border-right: none; }
-  .about-stat-card:nth-child(3) { border-top: 1px solid rgba(255, 255, 255, 0.05); }
-  .about-stat-card:nth-child(4) { border-top: 1px solid rgba(255, 255, 255, 0.05); }
+  .about-stat-card:nth-child(3) { border-top: 1px solid rgba(0, 0, 0, 0.06); }
+  .about-stat-card:nth-child(4) { border-top: 1px solid rgba(0, 0, 0, 0.06); }
+}
+.dark .about-stat-card:nth-child(3),
+.dark .about-stat-card:nth-child(4) {
+  border-top-color: rgba(255, 255, 255, 0.05) !important;
 }
 
 .about-card {
   padding: 2rem;
   border-radius: 1.25rem;
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(248, 250, 252, 0.8);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
 .about-card:hover {
   transform: translateY(-4px);
 }
-.about-card-emerald:hover { border-color: rgba(16, 185, 129, 0.2); }
-.about-card-indigo:hover { border-color: rgba(99, 102, 241, 0.2); }
+.about-card-emerald:hover { border-color: rgba(16, 185, 129, 0.3); }
+.about-card-indigo:hover { border-color: rgba(99, 102, 241, 0.3); }
+.dark .about-card {
+  background: rgba(15, 23, 42, 0.4);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+.dark .about-card-emerald:hover { border-color: rgba(16, 185, 129, 0.2); }
+.dark .about-card-indigo:hover { border-color: rgba(99, 102, 241, 0.2); }
 
 .about-card-badge {
   display: inline-flex;
@@ -622,12 +663,18 @@
 .about-value-card {
   padding: 1.5rem;
   border-radius: 1rem;
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(248, 250, 252, 0.8);
   transition: all 0.3s ease;
 }
 .about-value-card:hover {
-  background: rgba(30, 41, 59, 0.6);
+  background: rgba(241, 245, 249, 0.9);
   transform: translateY(-2px);
+}
+.dark .about-value-card {
+  background: rgba(15, 23, 42, 0.4);
+}
+.dark .about-value-card:hover {
+  background: rgba(30, 41, 59, 0.6);
 }
 
 .about-team-card {
@@ -640,5 +687,8 @@
   transition: background 0.3s ease;
 }
 .about-team-card:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+.dark .about-team-card:hover {
   background: rgba(255, 255, 255, 0.02);
 }

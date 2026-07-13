@@ -16,7 +16,7 @@ type Review = {
   rating: number
   comment?: string
   createdAt?: string
-  student?: { name: string }
+  user?: { name: string; image?: string }
 }
 
 type TutorProfile = {
@@ -24,7 +24,7 @@ type TutorProfile = {
   bio?: string
   hourlyPrice?: number
   subject?: string[]
-  user?: { name: string; email: string }
+  user?: { name: string; email: string; image?: string }
   categories?: Array<{ name: string }>
   category?: { name: string }
   rating?: number
@@ -40,6 +40,13 @@ type TutorProfile = {
 
 type Slot = { day: string; time: string }
 
+const GALLERY_IMAGES = [
+  'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop', // Group study
+  'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1200&auto=format&fit=crop', // Note taking
+  'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=1200&auto=format&fit=crop'  // Class
+]
+
+
 export default function TutorProfilePage() {
   const { id } = useParams()
   const { user } = useAuth()
@@ -49,6 +56,14 @@ export default function TutorProfilePage() {
   const [availability, setAvailability] = useState<Slot[]>([])
   const [loading, setLoading] = useState(true)
   const [booking, setBooking] = useState(false)
+  const [currentImageIdx, setCurrentImageIdx] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImageIdx((prev) => (prev + 1) % GALLERY_IMAGES.length)
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     Promise.all([
@@ -194,15 +209,43 @@ export default function TutorProfilePage() {
   return (
     <div className='max-w-4xl mx-auto py-10 px-4 space-y-6'>
       {/* Banner / Gallery Header */}
-      <div className='relative h-48 w-full rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 overflow-hidden shadow-lg border border-white/10'>
-        <div className='absolute inset-0 bg-black/20 mix-blend-multiply'></div>
+      <div className='relative h-64 w-full rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-white/10 group'>
+        {GALLERY_IMAGES.map((src, idx) => (
+          <div
+            key={src}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              idx === currentImageIdx ? 'opacity-100 z-10' : 'opacity-0 z-0'
+            }`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={src} alt='Gallery' className='w-full h-full object-cover transition-transform duration-10000 group-hover:scale-110' />
+            <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent'></div>
+          </div>
+        ))}
+        {/* Navigation dots */}
+        <div className='absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2'>
+          {GALLERY_IMAGES.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentImageIdx(idx)}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                idx === currentImageIdx ? 'w-6 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'
+              }`}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Header Profile Card */}
-      <Card className='-mt-16 relative z-10 mx-4 border-white/10 bg-slate-900/80 backdrop-blur-md'>
+      <Card className='-mt-16 relative z-10 mx-4 border-slate-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md'>
         <CardContent className='p-6 flex flex-col sm:flex-row gap-6 items-start sm:items-center'>
-          <div className='h-24 w-24 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-3xl shrink-0'>
-            {(tutor.user?.name ?? '?')[0].toUpperCase()}
+          <div className='h-24 w-24 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-3xl shrink-0 overflow-hidden ring-4 ring-slate-900 shadow-xl'>
+            {tutor.user?.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={tutor.user.image} alt={tutor.user.name ?? 'Tutor'} className='h-full w-full object-cover' />
+            ) : (
+              (tutor.user?.name ?? '?')[0].toUpperCase()
+            )}
           </div>
           <div className='flex-1 space-y-2'>
             <div>
@@ -279,11 +322,16 @@ export default function TutorProfilePage() {
                     <li key={review.id} className='border rounded-lg p-4 space-y-2'>
                       <div className='flex items-center justify-between'>
                         <div className='flex items-center gap-2'>
-                          <div className='h-8 w-8 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-xs'>
-                            {(review.student?.name ?? '?')[0].toUpperCase()}
+                          <div className='h-8 w-8 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-xs overflow-hidden'>
+                            {review.user?.image ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={review.user.image} alt={review.user.name ?? 'Student'} className='h-full w-full object-cover' />
+                            ) : (
+                              (review.user?.name ?? '?')[0].toUpperCase()
+                            )}
                           </div>
                           <div>
-                            <p className='text-sm font-medium'>{review.student?.name ?? 'Student'}</p>
+                            <p className='text-sm font-medium'>{review.user?.name ?? 'Student'}</p>
                             {review.createdAt && (
                               <p className='text-xs text-muted-foreground'>
                                 {new Date(review.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}
@@ -369,10 +417,15 @@ export default function TutorProfilePage() {
           <h2 className='text-2xl font-bold mb-6'>Similar Tutors</h2>
           <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6'>
             {relatedTutors.map((rt) => (
-              <Card key={rt.id} className='bg-slate-900/60 border-white/10 hover:border-white/20 transition-all cursor-pointer' onClick={() => router.push(`/tutors/${rt.id}`)}>
+              <Card key={rt.id} className='bg-slate-50/60 dark:bg-slate-900/60 border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all cursor-pointer' onClick={() => router.push(`/tutors/${rt.id}`)}>
                 <CardContent className='p-5 flex flex-col items-center text-center'>
-                  <div className='h-16 w-16 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xl mb-3'>
-                    {(rt.user?.name ?? '?')[0].toUpperCase()}
+                  <div className='h-16 w-16 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xl mb-3 overflow-hidden ring-2 ring-indigo-500/20'>
+                    {rt.user?.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={rt.user.image} alt={rt.user.name ?? 'Tutor'} className='h-full w-full object-cover' />
+                    ) : (
+                      (rt.user?.name ?? '?')[0].toUpperCase()
+                    )}
                   </div>
                   <h3 className='font-bold'>{rt.user?.name ?? 'Tutor'}</h3>
                   <p className='text-xs text-muted-foreground mt-1'>

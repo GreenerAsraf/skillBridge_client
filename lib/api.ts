@@ -9,12 +9,13 @@ const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/+$/, '') ?? ''
 
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken()
+  const isFormData = options.body instanceof FormData
 
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     credentials: 'include', // sends cookies if any
     headers: {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },

@@ -32,33 +32,33 @@ const stats = [
 const values = [
   {
     icon: BookOpen,
-    color: 'text-emerald-400',
-    bg: 'bg-emerald-400/10',
-    border: 'border-emerald-400/20',
+    color: 'text-emerald-500 dark:text-emerald-400',
+    bg: 'bg-emerald-500/10',
+    border: 'border-emerald-500/20',
     title: 'Curiosity First',
     desc: 'We believe the best learning starts with genuine curiosity. Our platform nurtures exploration and lifelong growth.',
   },
   {
     icon: Shield,
-    color: 'text-cyan-400',
-    bg: 'bg-cyan-400/10',
-    border: 'border-cyan-400/20',
+    color: 'text-cyan-500 dark:text-cyan-400',
+    bg: 'bg-cyan-500/10',
+    border: 'border-cyan-500/20',
     title: 'Vetted Quality',
     desc: 'Every tutor on SkillBridge undergoes strict background and skills checks so students always get the best.',
   },
   {
     icon: Globe,
-    color: 'text-indigo-400',
-    bg: 'bg-indigo-400/10',
-    border: 'border-indigo-400/20',
+    color: 'text-indigo-500 dark:text-indigo-400',
+    bg: 'bg-indigo-500/10',
+    border: 'border-indigo-500/20',
     title: 'Global Reach',
     desc: 'Students and tutors from every continent — no borders, no barriers, just world-class knowledge-sharing.',
   },
   {
     icon: Award,
-    color: 'text-amber-400',
-    bg: 'bg-amber-400/10',
-    border: 'border-amber-400/20',
+    color: 'text-amber-500 dark:text-amber-400',
+    bg: 'bg-amber-500/10',
+    border: 'border-amber-500/20',
     title: 'Trust & Safety',
     desc: 'Secure payments, authenticated reviews, and encrypted sessions put safety at the heart of everything.',
   },
@@ -104,7 +104,7 @@ export default function AboutPage() {
             {' & '}
             <span className='about-gradient-text-pink'>Learners</span>
           </h1>
-          <p className='text-slate-400 text-lg max-w-xl mx-auto font-light leading-relaxed'>
+          <p className='text-muted-foreground text-lg max-w-xl mx-auto font-light leading-relaxed'>
             SkillBridge was founded on a simple principle: high-quality,
             personalised education should be accessible instantly, anywhere in the world.
           </p>
@@ -120,13 +120,13 @@ export default function AboutPage() {
       </section>
 
       {/* ── Stats strip ───────────────────────────────────── */}
-      <section className='border-b border-white/5 bg-slate-900/40 backdrop-blur-sm'>
+      <section className='border-b border-border bg-muted/40 backdrop-blur-sm'>
         <div className='max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-px'>
           {stats.map(({ icon: Icon, value, label }) => (
             <div key={label} className='about-stat-card group'>
-              <Icon className='h-5 w-5 text-indigo-400 mb-2 group-hover:scale-110 transition-transform duration-300' />
-              <p className='text-2xl md:text-3xl font-black text-white'>{value}</p>
-              <p className='text-xs text-slate-500 mt-1 font-medium'>{label}</p>
+              <Icon className='h-5 w-5 text-indigo-500 dark:text-indigo-400 mb-2 group-hover:scale-110 transition-transform duration-300' />
+              <p className='text-2xl md:text-3xl font-black text-foreground'>{value}</p>
+              <p className='text-xs text-muted-foreground mt-1 font-medium'>{label}</p>
             </div>
           ))}
         </div>
@@ -140,18 +140,18 @@ export default function AboutPage() {
             <span className='about-card-badge about-card-badge-emerald'>
               <Target className='h-3.5 w-3.5' /> Mission
             </span>
-            <h2 className='text-xl font-bold text-white mt-4 mb-3'>
+            <h2 className='text-xl font-bold text-foreground mt-4 mb-3'>
               Empower Every Learner
             </h2>
-            <p className='text-sm text-slate-400 font-light leading-relaxed'>
+            <p className='text-sm text-muted-foreground font-light leading-relaxed'>
               To empower students by matching them with verified expert mentors who
               provide tailored 1-on-1 tutoring — helping them accelerate their
               understanding and reach their goals faster than they ever thought possible.
             </p>
             <ul className='mt-4 space-y-2'>
               {['Personalised learning paths', 'Instant session booking', 'Affordable pricing options'].map((item) => (
-                <li key={item} className='flex items-center gap-2 text-xs text-slate-400'>
-                  <CheckCircle2 className='h-3.5 w-3.5 text-emerald-400 flex-shrink-0' />
+                <li key={item} className='flex items-center gap-2 text-xs text-muted-foreground'>
+                  <CheckCircle2 className='h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400 flex-shrink-0' />
                   {item}
                 </li>
               ))}
@@ -163,18 +163,18 @@ export default function AboutPage() {
             <span className='about-card-badge about-card-badge-indigo'>
               <TrendingUp className='h-3.5 w-3.5' /> Vision
             </span>
-            <h2 className='text-xl font-bold text-white mt-4 mb-3'>
+            <h2 className='text-xl font-bold text-foreground mt-4 mb-3'>
               Education Without Borders
             </h2>
-            <p className='text-sm text-slate-400 font-light leading-relaxed'>
+            <p className='text-sm text-muted-foreground font-light leading-relaxed'>
               A world where anyone can pick up a new skill, ace a tough exam, or master
               a programming language by instantly connecting with the perfect mentor who
               matches their learning style — regardless of where they live.
             </p>
             <ul className='mt-4 space-y-2'>
               {['40+ countries served', '500+ expert tutors', 'Multi-language support'].map((item) => (
-                <li key={item} className='flex items-center gap-2 text-xs text-slate-400'>
-                  <CheckCircle2 className='h-3.5 w-3.5 text-indigo-400 flex-shrink-0' />
+                <li key={item} className='flex items-center gap-2 text-xs text-muted-foreground'>
+                  <CheckCircle2 className='h-3.5 w-3.5 text-indigo-500 dark:text-indigo-400 flex-shrink-0' />
                   {item}
                 </li>
               ))}
@@ -184,14 +184,14 @@ export default function AboutPage() {
       </section>
 
       {/* ── Core Values ───────────────────────────────────── */}
-      <section className='bg-slate-900/30 border-y border-white/5 py-24 px-6'>
+      <section className='bg-muted/30 border-y border-border py-24 px-6'>
         <div className='max-w-5xl mx-auto'>
           <div className='text-center mb-14'>
             <span className='about-badge'>Core Values</span>
-            <h2 className='mt-4 text-3xl md:text-4xl font-extrabold text-white tracking-tight'>
+            <h2 className='mt-4 text-3xl md:text-4xl font-extrabold text-foreground tracking-tight'>
               What We Stand By
             </h2>
-            <p className='text-slate-400 mt-3 font-light max-w-xl mx-auto text-sm'>
+            <p className='text-muted-foreground mt-3 font-light max-w-xl mx-auto text-sm'>
               Every decision we make is guided by four principles that define the SkillBridge experience.
             </p>
           </div>
@@ -204,8 +204,8 @@ export default function AboutPage() {
                 <div className={`h-11 w-11 rounded-xl ${bg} ${border} border flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   <Icon className={`h-5 w-5 ${color}`} />
                 </div>
-                <h3 className='font-semibold text-white text-sm mb-2'>{title}</h3>
-                <p className='text-xs text-slate-400 font-light leading-relaxed'>{desc}</p>
+                <h3 className='font-semibold text-foreground text-sm mb-2'>{title}</h3>
+                <p className='text-xs text-muted-foreground font-light leading-relaxed'>{desc}</p>
               </div>
             ))}
           </div>
@@ -216,18 +216,18 @@ export default function AboutPage() {
       <section className='max-w-3xl mx-auto py-24 px-6'>
         <div className='text-center mb-14'>
           <span className='about-badge'>Our Journey</span>
-          <h2 className='mt-4 text-3xl md:text-4xl font-extrabold text-white tracking-tight'>
+          <h2 className='mt-4 text-3xl md:text-4xl font-extrabold text-foreground tracking-tight'>
             How We Got Here
           </h2>
         </div>
         <ol className='relative border-l border-indigo-500/30 space-y-10 pl-6'>
-          {timeline.map(({ year, event }, i) => (
+          {timeline.map(({ year, event }) => (
             <li key={year} className='group'>
-              <span className='absolute -left-[9px] flex h-4.5 w-4.5 items-center justify-center rounded-full bg-indigo-500/20 border border-indigo-500/40 ring-4 ring-slate-950'>
-                <span className='h-2 w-2 rounded-full bg-indigo-400' />
+              <span className='absolute -left-[9px] flex h-4.5 w-4.5 items-center justify-center rounded-full bg-indigo-500/20 border border-indigo-500/40 ring-4 ring-background'>
+                <span className='h-2 w-2 rounded-full bg-indigo-500 dark:bg-indigo-400' />
               </span>
-              <time className='text-xs font-bold text-indigo-400 tracking-widest uppercase'>{year}</time>
-              <p className='mt-1 text-sm text-slate-300 font-light leading-relaxed group-hover:text-white transition-colors duration-200'>
+              <time className='text-xs font-bold text-indigo-500 dark:text-indigo-400 tracking-widest uppercase'>{year}</time>
+              <p className='mt-1 text-sm text-muted-foreground font-light leading-relaxed group-hover:text-foreground transition-colors duration-200'>
                 {event}
               </p>
             </li>
@@ -236,14 +236,14 @@ export default function AboutPage() {
       </section>
 
       {/* ── Team ──────────────────────────────────────────── */}
-      <section className='bg-slate-900/30 border-t border-white/5 py-24 px-6'>
+      <section className='bg-muted/30 border-t border-border py-24 px-6'>
         <div className='max-w-5xl mx-auto'>
           <div className='text-center mb-14'>
             <span className='about-badge'>The People</span>
-            <h2 className='mt-4 text-3xl md:text-4xl font-extrabold text-white tracking-tight'>
+            <h2 className='mt-4 text-3xl md:text-4xl font-extrabold text-foreground tracking-tight'>
               Meet the Team
             </h2>
-            <p className='text-slate-400 mt-3 font-light max-w-lg mx-auto text-sm'>
+            <p className='text-muted-foreground mt-3 font-light max-w-lg mx-auto text-sm'>
               A small team with a big mission — passionate about reshaping how the world learns.
             </p>
           </div>
@@ -253,8 +253,8 @@ export default function AboutPage() {
                 <div className={`h-16 w-16 rounded-2xl bg-gradient-to-br ${grad} flex items-center justify-center text-white text-xl font-bold shadow-lg mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   {avatar}
                 </div>
-                <p className='font-semibold text-white text-sm'>{name}</p>
-                <p className='text-xs text-slate-500 mt-0.5'>{role}</p>
+                <p className='font-semibold text-foreground text-sm'>{name}</p>
+                <p className='text-xs text-muted-foreground mt-0.5'>{role}</p>
               </div>
             ))}
           </div>
@@ -265,11 +265,11 @@ export default function AboutPage() {
       <section className='relative py-24 px-6 overflow-hidden'>
         <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-indigo-600/10 via-purple-600/5 to-pink-600/10' />
         <div className='relative z-10 max-w-2xl mx-auto text-center space-y-5'>
-          <Heart className='h-8 w-8 text-pink-400 mx-auto' />
-          <h2 className='text-3xl md:text-4xl font-extrabold text-white tracking-tight'>
+          <Heart className='h-8 w-8 text-pink-500 dark:text-pink-400 mx-auto' />
+          <h2 className='text-3xl md:text-4xl font-extrabold text-foreground tracking-tight'>
             Ready to start your journey?
           </h2>
-          <p className='text-slate-400 font-light'>
+          <p className='text-muted-foreground font-light'>
             Join thousands of students already unlocking new skills on SkillBridge.
           </p>
           <div className='flex flex-wrap gap-3 justify-center pt-2'>

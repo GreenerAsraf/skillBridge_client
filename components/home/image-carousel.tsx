@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Star, Award } from 'lucide-react'
 import { apiFetch } from '@/lib/api'
 
@@ -99,10 +100,12 @@ function TeacherCard({ tutor, index }: { tutor: Tutor; index: number }) {
         {/* Avatar */}
         <div className='relative mx-auto w-fit'>
           {tutor.user?.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={tutor.user.image}
               alt={tutor.user.name}
+              width={72}
+              height={72}
+              loading='lazy'
               className='w-[72px] h-[72px] rounded-full object-cover ring-2 ring-white/10 shadow-lg'
             />
           ) : (
@@ -120,9 +123,9 @@ function TeacherCard({ tutor, index }: { tutor: Tutor; index: number }) {
 
         {/* Name & category */}
         <div className='mt-3 text-center'>
-          <p className='font-bold text-sm text-white leading-snug'>{tutor.user?.name ?? 'Tutor'}</p>
+          <p className='font-bold text-sm leading-snug teacher-card-name'>{tutor.user?.name ?? 'Tutor'}</p>
           {tutor.category?.name && (
-            <p className='text-[10px] text-slate-400 mt-0.5 tracking-wide'>{tutor.category.name}</p>
+            <p className='text-[10px] teacher-card-muted mt-0.5 tracking-wide'>{tutor.category.name}</p>
           )}
         </div>
 
@@ -132,7 +135,7 @@ function TeacherCard({ tutor, index }: { tutor: Tutor; index: number }) {
             {tutor.subject.slice(0, 2).map((s) => (
               <span
                 key={s}
-                className='text-[9px] bg-white/5 border border-white/10 text-slate-300 rounded-full px-2 py-0.5'
+                className='teacher-card-chip text-[9px] rounded-full px-2 py-0.5'
               >
                 {s}
               </span>
@@ -141,15 +144,15 @@ function TeacherCard({ tutor, index }: { tutor: Tutor; index: number }) {
         )}
 
         {/* Rating + price */}
-        <div className='flex items-center justify-between w-full mt-auto pt-3 border-t border-white/8 text-xs'>
+        <div className='flex items-center justify-between w-full mt-auto pt-3 teacher-card-footer border-t text-xs'>
           <span className='flex items-center gap-0.5 text-amber-400 font-semibold'>
             <Star className='h-3 w-3 fill-amber-400 stroke-amber-400' />
             {tutor.rating != null ? tutor.rating.toFixed(1) : 'New'}
             {tutor._count?.reviews != null && (
-              <span className='text-slate-500 font-normal ml-0.5'>({tutor._count.reviews})</span>
+              <span className='teacher-card-muted font-normal ml-0.5'>({tutor._count.reviews})</span>
             )}
           </span>
-          <span className='text-slate-300 font-medium'>
+          <span className='teacher-card-price font-medium'>
             {tutor.hourlyPrice != null ? `$${tutor.hourlyPrice}/hr` : ''}
           </span>
         </div>
@@ -179,30 +182,30 @@ export default function BestTeachersCarousel() {
   const items = [...tutors, ...tutors]
 
   return (
-    <section className='relative w-full overflow-hidden bg-slate-950 py-14 border-b border-white/5'>
+    <section className='relative w-full overflow-hidden bg-muted/20 dark:bg-slate-950 py-14 border-b border-border'>
       {/* Ambient blobs */}
       <div className='absolute top-0 left-1/4 w-80 h-80 bg-violet-600/8 rounded-full blur-3xl pointer-events-none' />
       <div className='absolute bottom-0 right-1/3 w-80 h-80 bg-cyan-600/8 rounded-full blur-3xl pointer-events-none' />
 
       {/* Heading */}
       <div className='text-center mb-10 px-6 relative z-10'>
-        <span className='inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.15em] uppercase bg-amber-500/10 border border-amber-500/20 text-amber-400 px-3 py-1 rounded-full mb-3'>
+        <span className='inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.15em] uppercase bg-amber-500/10 border border-amber-500/20 text-amber-500 dark:text-amber-400 px-3 py-1 rounded-full mb-3'>
           <Award className='h-3 w-3' /> Top Rated Tutors
         </span>
-        <h2 className='text-2xl sm:text-3xl font-extrabold text-white tracking-tight'>
+        <h2 className='text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight'>
           Learn from the{' '}
           <span className='bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent'>
             Best Teachers
           </span>
         </h2>
-        <p className='text-slate-400 text-sm mt-2 font-light'>
+        <p className='text-muted-foreground text-sm mt-2 font-light'>
           Highly rated tutors trusted by thousands of students worldwide.
         </p>
       </div>
 
-      {/* Edge fade masks */}
-      <div className='absolute left-0 top-0 h-full w-20 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none' />
-      <div className='absolute right-0 top-0 h-full w-20 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none' />
+      {/* Edge fade masks — adapt to background */}
+      <div className='absolute left-0 top-0 h-full w-20 bg-gradient-to-r from-background dark:from-slate-950 to-transparent z-10 pointer-events-none' />
+      <div className='absolute right-0 top-0 h-full w-20 bg-gradient-to-l from-background dark:from-slate-950 to-transparent z-10 pointer-events-none' />
 
       {/* Scrolling track */}
       <div className='marquee-outer'>
@@ -281,16 +284,61 @@ export default function BestTeachersCarousel() {
           margin: 2px;
           height: calc(100% - 4px);
           border-radius: 18px;
-          background: #0f172a;
+          background: #f8fafc;
           display: flex;
           flex-direction: column;
           align-items: center;
           padding: 18px 14px 14px;
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+          box-shadow: inset 0 1px 0 rgba(0,0,0,0.04);
           transition: background 0.3s;
         }
         .teacher-card-outer:hover .teacher-card-body {
+          background: #f1f5f9;
+        }
+
+        /* Dark mode overrides */
+        .dark .teacher-card-body {
+          background: #0f172a;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+        }
+        .dark .teacher-card-outer:hover .teacher-card-body {
           background: #1e293b;
+        }
+
+        /* ─── Text colour helpers that swap per theme ────────── */
+        .teacher-card-name {
+          color: #0f172a;
+        }
+        .dark .teacher-card-name {
+          color: #ffffff;
+        }
+        .teacher-card-muted {
+          color: #64748b;
+        }
+        .dark .teacher-card-muted {
+          color: #94a3b8;
+        }
+        .teacher-card-price {
+          color: #334155;
+        }
+        .dark .teacher-card-price {
+          color: #cbd5e1;
+        }
+        .teacher-card-chip {
+          background: rgba(0,0,0,0.05);
+          border: 1px solid rgba(0,0,0,0.08);
+          color: #475569;
+        }
+        .dark .teacher-card-chip {
+          background: rgba(255,255,255,0.05);
+          border-color: rgba(255,255,255,0.10);
+          color: #cbd5e1;
+        }
+        .teacher-card-footer {
+          border-color: rgba(0,0,0,0.08);
+        }
+        .dark .teacher-card-footer {
+          border-color: rgba(255,255,255,0.08);
         }
       `}</style>
     </section>

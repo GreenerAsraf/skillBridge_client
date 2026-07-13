@@ -54,7 +54,7 @@ function StarRating({ rating }: { rating: number }) {
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
-          className={`h-4 w-4 ${i < rating ? 'fill-amber-400 stroke-amber-400' : 'stroke-slate-600'}`}
+          className={`h-4 w-4 ${i < rating ? 'fill-amber-400 stroke-amber-400' : 'stroke-muted-foreground/50'}`}
         />
       ))}
     </div>
@@ -164,7 +164,7 @@ export default function TestimonialsSection() {
                       className={`h-1.5 rounded-full transition-all duration-300 ${
                         i === activeIndex
                           ? 'w-5 bg-emerald-400'
-                          : 'w-1.5 bg-slate-600'
+                          : 'w-1.5 bg-muted-foreground/40'
                       }`}
                     />
                   ))}
@@ -212,18 +212,18 @@ function TestimonialCard({ review }: { review: Review }) {
       <p className='text-sm text-muted-foreground leading-relaxed font-light flex-1'>
         &ldquo;{review.comment || 'Great session! Highly recommend this tutor.'}&rdquo;
       </p>
-      <div className='flex items-center gap-3 pt-2 border-t border-white/5'>
+      <div className='flex items-center gap-3 pt-2 border-t border-border'>
         <div
           className={`h-9 w-9 rounded-full bg-gradient-to-br ${colors[colorIndex]} flex items-center justify-center text-white text-xs font-bold shrink-0`}
         >
           {initials}
         </div>
         <div>
-          <p className='text-sm font-medium text-slate-100'>
+          <p className='text-sm font-medium text-foreground'>
             {review.student?.name ?? 'Anonymous'}
           </p>
           {review.tutor?.user?.name && (
-            <p className='text-xs text-slate-500'>
+            <p className='text-xs text-muted-foreground'>
               Tutored by {review.tutor.user.name}
             </p>
           )}

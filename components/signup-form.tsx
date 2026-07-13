@@ -22,6 +22,8 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 import { useRouter } from 'next/navigation'
 import { signUp, betterAuthClient } from '@/lib/auth-client'
+import { useRef, useState } from 'react'
+import { Camera, X } from 'lucide-react'
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -39,6 +41,10 @@ const formSchema = z.object({
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const router = useRouter()
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [avatarDataUrl, setAvatarDataUrl] = useState<string | null>(null)
+
   const form = useForm({
     defaultValues: {
       name: '',
@@ -60,20 +66,22 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     onSubmit: async ({ value }) => {
       const toastId = toast.loading('Creating account...')
 
+      // Use uploaded file (data URL) if present, otherwise use typed URL
+      const imageValue = avatarDataUrl || (value.image.trim() || undefined)
+
       const { data, error } = await signUp.email({
         name: value.name,
         email: value.email,
         password: value.password,
-        image: value.image || undefined,
-        role: value.role, // already uppercase: 'STUDENT' | 'TUTOR'
+        image: imageValue,
+        role: value.role,
       })
 
       if (error) {
-        console.log(error,"error in sign up ")
+        console.log(error, "error in sign up ")
         toast.error(error.message || 'Something went wrong, please try again.', { id: toastId })
       } else if (data) {
         toast.success(`Registered successfully as ${value.role.toLowerCase()}!`, { id: toastId })
-        // Redirect based on role
         const roleRedirect: Record<string, string> = {
           STUDENT: '/dashboard',
           TUTOR: '/tutor/dashboard',
@@ -82,6 +90,41 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       }
     }
   })
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image must be under 2 MB')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = reader.result as string
+      setAvatarPreview(result)
+      setAvatarDataUrl(result)
+      // Clear the URL field since we have a file
+      form.setFieldValue('image', '')
+    }
+    reader.readAsDataURL(file)
+  }
+
+  function handleUrlChange(url: string, fieldChange: (v: string) => void) {
+    fieldChange(url)
+    if (url.trim()) {
+      setAvatarPreview(url.trim())
+      setAvatarDataUrl(null) // clear uploaded file
+    } else {
+      setAvatarPreview(null)
+    }
+  }
+
+  function clearAvatar() {
+    setAvatarPreview(null)
+    setAvatarDataUrl(null)
+    form.setFieldValue('image', '')
+    if (fileRef.current) fileRef.current.value = ''
+  }
 
   return (
     <Card {...props}>
@@ -140,26 +183,87 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               }}
             />
 
-            <form.Field
-              name='image'
-              children={(field) => {
-                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-                return (
-                  <Field>
-                    <FieldLabel htmlFor={field.name}>Profile Picture URL (Optional)</FieldLabel>
-                    <Input
-                      type='url'
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder='https://example.com/avatar.jpg'
-                    />
-                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                  </Field>
-                )
-              }}
-            />
+            {/* Profile Picture Upload Section */}
+            <Field>
+              <FieldLabel>Profile Picture (Optional)</FieldLabel>
+              <div className='flex items-center gap-4'>
+                {/* Avatar preview */}
+                <div className='relative flex-shrink-0'>
+                  {avatarPreview ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={avatarPreview}
+                        alt='avatar preview'
+                        className='h-14 w-14 rounded-full object-cover ring-2 ring-indigo-500/40'
+                        onError={() => setAvatarPreview(null)}
+                      />
+                      <button
+                        type='button'
+                        onClick={clearAvatar}
+                        className='absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 flex items-center justify-center text-white hover:bg-red-600 transition-colors'
+                      >
+                        <X className='h-3 w-3' />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type='button'
+                      onClick={() => fileRef.current?.click()}
+                      className='h-14 w-14 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-600/20 border-2 border-dashed border-indigo-500/40 flex items-center justify-center hover:border-indigo-500/70 transition-colors'
+                    >
+                      <Camera className='h-5 w-5 text-indigo-400' />
+                    </button>
+                  )}
+                </div>
+
+                <div className='flex-1 space-y-2'>
+                  {/* Upload button */}
+                  <div className='flex items-center gap-2'>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      onClick={() => fileRef.current?.click()}
+                      className='text-xs h-7'
+                    >
+                      Upload File
+                    </Button>
+                    <span className='text-xs text-muted-foreground'>or paste URL below</span>
+                  </div>
+
+                  {/* URL input */}
+                  <form.Field
+                    name='image'
+                    children={(field) => {
+                      const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                      return (
+                        <>
+                          <Input
+                            type='url'
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onChange={(e) => handleUrlChange(e.target.value, field.handleChange)}
+                            placeholder='https://example.com/avatar.jpg'
+                            className='h-8 text-xs'
+                            disabled={!!avatarDataUrl}
+                          />
+                          {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                        </>
+                      )
+                    }}
+                  />
+                </div>
+              </div>
+              <input
+                ref={fileRef}
+                type='file'
+                accept='image/*'
+                className='hidden'
+                onChange={handleFileChange}
+              />
+            </Field>
 
             <form.Field
               name='password'

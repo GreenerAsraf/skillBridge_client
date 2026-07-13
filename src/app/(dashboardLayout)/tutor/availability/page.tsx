@@ -46,7 +46,7 @@ export default function AvailabilityPage() {
 
   useEffect(() => {
     // Fetch current profile to get existing availability
-    apiFetch<{ data: { availability?: Array<{ day: DayEnum; startTime: string; endTime: string }> } }>('/api/tutors/me')
+    apiFetch<{ data: { availability?: Array<{ day: DayEnum; startTime: string; endTime: string }> } }>('/api/tutor/profile')
       .then((res) => {
         if (res.data?.availability) {
           const parsed = res.data.availability.map((av) => ({
@@ -88,7 +88,7 @@ export default function AvailabilityPage() {
 
     try {
       const res = await apiFetch<{ success: boolean; message?: string }>('/api/tutor/availability', {
-        method: 'PATCH',
+        method: 'PUT',
         body: JSON.stringify({ availabilities: payload }),
       })
 
@@ -115,8 +115,8 @@ export default function AvailabilityPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-white">Manage Availability</h1>
-        <p className="text-slate-400 mt-2">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Manage Availability</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-2">
           Define your weekly teaching schedule. Students can only book you during these slots.
         </p>
       </div>
@@ -143,11 +143,11 @@ export default function AvailabilityPage() {
             .filter((s) => s.day === day.value)
 
           return (
-            <Card key={day.value} className="border-slate-800 bg-slate-900/50 backdrop-blur-sm overflow-hidden">
+            <Card key={day.value} className="border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden">
               <div className="flex flex-col sm:flex-row">
                 {/* Day Header */}
-                <div className="w-full sm:w-48 bg-slate-900 p-4 border-r border-slate-800 flex items-center justify-between sm:justify-start gap-3">
-                  <h3 className="font-semibold text-slate-200">{day.label}</h3>
+                <div className="w-full sm:w-48 bg-white dark:bg-slate-900 p-4 border-r border-slate-200 dark:border-slate-800 flex items-center justify-between sm:justify-start gap-3">
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-200">{day.label}</h3>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -173,14 +173,14 @@ export default function AvailabilityPage() {
                             type="time"
                             value={slot.startTime}
                             onChange={(e) => handleSlotChange(slot.originalIndex, 'startTime', e.target.value)}
-                            className="bg-slate-950 border border-slate-800 rounded-md px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
+                            className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-slate-200 focus:outline-none focus:border-indigo-500"
                           />
                           <span className="text-slate-500 text-sm">to</span>
                           <input
                             type="time"
                             value={slot.endTime}
                             onChange={(e) => handleSlotChange(slot.originalIndex, 'endTime', e.target.value)}
-                            className="bg-slate-950 border border-slate-800 rounded-md px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
+                            className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-slate-200 focus:outline-none focus:border-indigo-500"
                           />
                           <Button
                             variant="ghost"

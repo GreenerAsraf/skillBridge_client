@@ -152,7 +152,7 @@ Design your own schema for the following tables:
 
 ---
 BETTER_AUTH_SECRET="${{secret()}}"
-BETTER_AUTH_URL="https://skillbridgebackend-production-19ba.up.railway.app"
+BETTER_AUTH_URL="https://skillbridge-backend-xm86.onrender.com"
 DATABASE_URL="postgresql://neondb_owner:npg_8lvTN9cEnyYR@ep-damp-sea-aijtvoij-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 FRONTEND_URL="https://skill-bridge-client-pi.vercel.app"
 ## Flow Diagrams

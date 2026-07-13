@@ -7,13 +7,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
-import { Camera, Lock, User, Eye, EyeOff, CheckCircle2 } from 'lucide-react'
+import { Camera, Lock, User, Eye, EyeOff, CheckCircle2, Link, X } from 'lucide-react'
 
 export default function StudentProfilePage() {
   const { user, refetch } = useAuth()
   const [name, setName] = useState(user?.name ?? '')
   const [saving, setSaving] = useState(false)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [imageUrlInput, setImageUrlInput] = useState('')
+  const [showUrlInput, setShowUrlInput] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   // Password change state
@@ -26,31 +29,45 @@ export default function StudentProfilePage() {
 
   useEffect(() => {
     if (user?.name) setName(user.name)
-  }, [user?.name])
+    if (user?.image) {
+      setAvatarPreview(user.image)
+      setImageUrlInput(user.image)
+    }
+  }, [user?.name, user?.image])
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
     try {
+      let imageUrl = user?.image ?? ''
+
+      if (avatarFile) {
+        const formData = new FormData()
+        formData.append('avatar', avatarFile)
+        const uploadRes = await apiFetch<{ success: boolean; data?: { image?: string } }>('/api/users/avatar', {
+          method: 'POST',
+          body: formData,
+        })
+        if (uploadRes.success && uploadRes.data?.image) {
+          imageUrl = uploadRes.data.image
+          setAvatarFile(null)
+        }
+      } else if (imageUrlInput.trim() && imageUrlInput.trim() !== user?.image) {
+        imageUrl = imageUrlInput.trim()
+      }
+
       await apiFetch('/api/users/profile', {
         method: 'PATCH',
         body: JSON.stringify({
           name,
-          ...(avatarPreview ? { image: avatarPreview } : {}),
+          image: imageUrl || undefined,
         }),
       })
       await refetch()
       toast.success('Profile updated!')
     } catch (err: unknown) {
-      // Fallback: older endpoint
-      try {
-        await apiFetch('/api/auth/me', { method: 'PATCH', body: JSON.stringify({ name }) })
-        await refetch()
-        toast.success('Profile updated!')
-      } catch {
-        const message = err instanceof Error ? err.message : 'Failed to update profile'
-        toast.error(message)
-      }
+      const message = err instanceof Error ? err.message : 'Failed to update profile'
+      toast.error(message)
     } finally {
       setSaving(false)
     }
@@ -91,9 +108,31 @@ export default function StudentProfilePage() {
       toast.error('Image must be under 2 MB')
       return
     }
+    setAvatarFile(file)
+    setShowUrlInput(false)
     const reader = new FileReader()
-    reader.onload = () => setAvatarPreview(reader.result as string)
+    reader.onload = () => {
+      setAvatarPreview(reader.result as string)
+      setImageUrlInput('')
+    }
     reader.readAsDataURL(file)
+  }
+
+  function handleUrlInputChange(url: string) {
+    setImageUrlInput(url)
+    if (url.trim()) {
+      setAvatarPreview(url.trim())
+      setAvatarFile(null)
+      if (fileRef.current) fileRef.current.value = ''
+    }
+  }
+
+  function clearAvatar() {
+    setAvatarPreview(null)
+    setAvatarFile(null)
+    setImageUrlInput('')
+    setShowUrlInput(false)
+    if (fileRef.current) fileRef.current.value = ''
   }
 
   const initials = (user?.name ?? 'U')
@@ -121,7 +160,7 @@ export default function StudentProfilePage() {
       </div>
 
       {/* Profile Info Card */}
-      <Card className='border-white/10 bg-slate-900/60 backdrop-blur-sm'>
+      <Card className='border-slate-200 dark:border-white/10 bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm'>
         <CardHeader>
           <CardTitle className='flex items-center gap-2 text-base'>
             <User className='h-4 w-4 text-indigo-400' /> Personal Information
@@ -138,6 +177,7 @@ export default function StudentProfilePage() {
                   src={avatarPreview}
                   alt='avatar preview'
                   className='h-16 w-16 rounded-full object-cover ring-2 ring-indigo-500/40'
+                  onError={() => setAvatarPreview(null)}
                 />
               ) : (
                 <div className='h-16 w-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl'>
@@ -159,18 +199,59 @@ export default function StudentProfilePage() {
                 onChange={handleFileChange}
               />
             </div>
-            <div>
-              <p className='text-sm font-medium text-slate-100'>{user?.name ?? 'Your Name'}</p>
+            <div className='space-y-1'>
+              <p className='text-sm font-medium text-slate-900 dark:text-slate-100'>{user?.name ?? 'Your Name'}</p>
               <p className='text-xs text-slate-500'>{user?.email}</p>
-              <button
-                onClick={() => fileRef.current?.click()}
-                type='button'
-                className='text-xs text-indigo-400 hover:text-indigo-300 transition-colors mt-1 underline'
-              >
-                Change avatar
-              </button>
+              <div className='flex items-center gap-2 mt-1'>
+                <button
+                  onClick={() => fileRef.current?.click()}
+                  type='button'
+                  className='text-xs text-indigo-400 hover:text-indigo-300 transition-colors underline'
+                >
+                  Upload photo
+                </button>
+                <span className='text-xs text-muted-foreground'>·</span>
+                <button
+                  type='button'
+                  onClick={() => setShowUrlInput((v) => !v)}
+                  className='text-xs text-indigo-400 hover:text-indigo-300 transition-colors underline flex items-center gap-1'
+                >
+                  <Link className='h-3 w-3' />
+                  Use URL
+                </button>
+                {avatarPreview && (
+                  <>
+                    <span className='text-xs text-muted-foreground'>·</span>
+                    <button
+                      type='button'
+                      onClick={clearAvatar}
+                      className='text-xs text-red-500 hover:text-red-400 transition-colors underline flex items-center gap-1'
+                    >
+                      <X className='h-3 w-3' />
+                      Remove
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
+
+          {/* URL input panel */}
+          {showUrlInput && (
+            <div className='space-y-1 mb-4'>
+              <label className='text-xs font-medium text-muted-foreground'>Image URL</label>
+              <Input
+                type='url'
+                value={imageUrlInput}
+                onChange={(e) => handleUrlInputChange(e.target.value)}
+                placeholder='https://example.com/avatar.jpg'
+                className='text-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10'
+              />
+              <p className='text-xs text-muted-foreground'>
+                Paste a direct image link. Saved when you click Save Changes.
+              </p>
+            </div>
+          )}
 
           <form onSubmit={handleSave} className='space-y-4'>
             <div className='space-y-1'>
@@ -180,17 +261,17 @@ export default function StudentProfilePage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder='Your name'
-                className='bg-slate-900 border-white/10'
+                className='bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white'
               />
             </div>
             <div className='space-y-1'>
               <label className='text-sm font-medium'>Email</label>
-              <Input value={user?.email ?? ''} disabled className='opacity-50 bg-slate-900 border-white/5' />
+              <Input value={user?.email ?? ''} disabled className='opacity-50 bg-white dark:bg-slate-900 border-slate-200 dark:border-white/5 text-slate-900 dark:text-white' />
               <p className='text-xs text-muted-foreground'>Email cannot be changed here.</p>
             </div>
             <div className='space-y-1'>
               <label className='text-sm font-medium'>Role</label>
-              <Input value={user?.role ?? ''} disabled className='opacity-50 bg-slate-900 border-white/5 capitalize' />
+              <Input value={user?.role ?? ''} disabled className='opacity-50 bg-white dark:bg-slate-900 border-slate-200 dark:border-white/5 capitalize text-slate-900 dark:text-white' />
             </div>
             <Button
               id='save-profile'
@@ -205,7 +286,7 @@ export default function StudentProfilePage() {
       </Card>
 
       {/* Password Change Card */}
-      <Card className='border-white/10 bg-slate-900/60 backdrop-blur-sm'>
+      <Card className='border-slate-200 dark:border-white/10 bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm'>
         <CardHeader>
           <CardTitle className='flex items-center gap-2 text-base'>
             <Lock className='h-4 w-4 text-amber-400' /> Change Password
@@ -224,7 +305,7 @@ export default function StudentProfilePage() {
                   value={currentPw}
                   onChange={(e) => setCurrentPw(e.target.value)}
                   placeholder='••••••••'
-                  className='pr-10 bg-slate-900 border-white/10'
+                  className='pr-10 bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white'
                 />
                 <button
                   type='button'
@@ -246,7 +327,7 @@ export default function StudentProfilePage() {
                   value={newPw}
                   onChange={(e) => setNewPw(e.target.value)}
                   placeholder='Min. 6 characters'
-                  className='pr-10 bg-slate-900 border-white/10'
+                  className='pr-10 bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white'
                 />
                 <button
                   type='button'
@@ -294,7 +375,7 @@ export default function StudentProfilePage() {
                   value={confirmPw}
                   onChange={(e) => setConfirmPw(e.target.value)}
                   placeholder='Re-enter new password'
-                  className={`bg-slate-900 border-white/10 ${
+                  className={`bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white ${
                     confirmPw && confirmPw !== newPw ? 'border-rose-500/50' : ''
                   } ${confirmPw && confirmPw === newPw ? 'border-emerald-500/50' : ''}`}
                 />

@@ -674,6 +674,10 @@ Remaining: Ensure the booking form uses a date/time picker that respects the tut
 Remaining: The backend needs logic in POST /api/reviews to enforce that a student can only leave a review if their booking status is COMPLETED, and ensure they can only leave one review per booking. The frontend needs a UI to submit this star rating and comment after a session.
 [FE-C5] Tutor Dashboard - Manage Availability:
 Remaining: The /tutor/availability/ route needs a weekly schedule grid (Day × TimeSlot) UI so tutors can easily add/remove the times they are available to teach.
+
+
+
+
 [FE-C1] Dark Mode Consistency:
 Remaining: While you have a theme toggle, many components (like the new carousel and about page) currently use hardcoded dark colors (e.g., bg-slate-950, text-white). These need a pass to use CSS variables or Tailwind's dark: modifier so they look good in Light Mode.
 [FE-C6 / BE-C5] Production Readiness & Optimization:

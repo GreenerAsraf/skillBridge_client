@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/components/auth-provider'
 import { apiFetch } from '@/lib/api'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { Camera, Link, X } from 'lucide-react'
 
 type Category = { id: string; name: string }
 
@@ -40,11 +41,16 @@ export default function TutorProfilePage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [image, setImage] = useState('')
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [imageUrlInput, setImageUrlInput] = useState('')
+  const [showUrlInput, setShowUrlInput] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (user?.image) {
-      setImage(user.image as string)
+      setAvatarPreview(user.image)
+      setImageUrlInput(user.image)
     }
   }, [user])
 
@@ -73,6 +79,26 @@ export default function TutorProfilePage() {
     e.preventDefault()
     setSaving(true)
     try {
+      let imageUrl = user?.image ?? ''
+
+      // Priority 1: Uploaded file → upload to server
+      if (avatarFile) {
+        const formData = new FormData()
+        formData.append('avatar', avatarFile)
+        const uploadRes = await apiFetch<{ success: boolean; data?: { image?: string } }>('/api/users/avatar', {
+          method: 'POST',
+          body: formData,
+        })
+        if (uploadRes.success && uploadRes.data?.image) {
+          imageUrl = uploadRes.data.image
+          setAvatarFile(null)
+        }
+      }
+      // Priority 2: URL typed in the URL input field
+      else if (imageUrlInput.trim() && imageUrlInput.trim() !== user?.image) {
+        imageUrl = imageUrlInput.trim()
+      }
+
       await apiFetch('/api/tutor/profile', {
         method: 'PUT',
         body: JSON.stringify({
@@ -83,10 +109,11 @@ export default function TutorProfilePage() {
         }),
       })
 
-      if (image && image !== user?.image) {
+      // Always update image if it changed
+      if (imageUrl !== (user?.image ?? '')) {
         await apiFetch('/api/users/profile', {
           method: 'PATCH',
-          body: JSON.stringify({ image }),
+          body: JSON.stringify({ image: imageUrl }),
         })
       }
 
@@ -99,6 +126,47 @@ export default function TutorProfilePage() {
       setSaving(false)
     }
   }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image must be under 2 MB')
+      return
+    }
+    setAvatarFile(file)
+    setShowUrlInput(false)
+    const reader = new FileReader()
+    reader.onload = () => {
+      setAvatarPreview(reader.result as string)
+      setImageUrlInput('')
+    }
+    reader.readAsDataURL(file)
+  }
+
+  function handleUrlInputChange(url: string) {
+    setImageUrlInput(url)
+    if (url.trim()) {
+      setAvatarPreview(url.trim())
+      setAvatarFile(null)
+      if (fileRef.current) fileRef.current.value = ''
+    }
+  }
+
+  function clearAvatar() {
+    setAvatarPreview(null)
+    setAvatarFile(null)
+    setImageUrlInput('')
+    setShowUrlInput(false)
+    if (fileRef.current) fileRef.current.value = ''
+  }
+
+  const initials = (user?.name ?? 'U')
+    .split(' ')
+    .map((w: string) => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
 
   if (loading) {
     return (
@@ -117,7 +185,91 @@ export default function TutorProfilePage() {
         <CardHeader>
           <CardTitle>Account Info</CardTitle>
         </CardHeader>
-        <CardContent className='space-y-3'>
+        <CardContent className='space-y-5'>
+          <div className='flex items-center gap-5'>
+            <div className='relative group'>
+              {avatarPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={avatarPreview}
+                  alt='avatar preview'
+                  className='h-16 w-16 rounded-full object-cover ring-2 ring-indigo-500/40'
+                  onError={() => setAvatarPreview(null)}
+                />
+              ) : (
+                <div className='h-16 w-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl'>
+                  {initials}
+                </div>
+              )}
+              <button
+                onClick={() => fileRef.current?.click()}
+                className='absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200'
+                type='button'
+              >
+                <Camera className='h-5 w-5 text-white' />
+              </button>
+              <input
+                ref={fileRef}
+                type='file'
+                accept='image/*'
+                className='hidden'
+                onChange={handleFileChange}
+              />
+            </div>
+            <div className='space-y-1'>
+              <p className='text-sm font-medium'>{user?.name ?? 'Your Name'}</p>
+              <p className='text-xs text-muted-foreground'>{user?.email}</p>
+              <div className='flex items-center gap-2 mt-1'>
+                <button
+                  onClick={() => fileRef.current?.click()}
+                  type='button'
+                  className='text-xs text-indigo-500 hover:text-indigo-400 transition-colors underline'
+                >
+                  Upload photo
+                </button>
+                <span className='text-xs text-muted-foreground'>·</span>
+                <button
+                  type='button'
+                  onClick={() => setShowUrlInput((v) => !v)}
+                  className='text-xs text-indigo-500 hover:text-indigo-400 transition-colors underline flex items-center gap-1'
+                >
+                  <Link className='h-3 w-3' />
+                  Use URL
+                </button>
+                {avatarPreview && (
+                  <>
+                    <span className='text-xs text-muted-foreground'>·</span>
+                    <button
+                      type='button'
+                      onClick={clearAvatar}
+                      className='text-xs text-red-500 hover:text-red-400 transition-colors underline flex items-center gap-1'
+                    >
+                      <X className='h-3 w-3' />
+                      Remove
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* URL input panel */}
+          {showUrlInput && (
+            <div className='space-y-1'>
+              <label className='text-xs font-medium text-muted-foreground'>Image URL</label>
+              <Input
+                type='url'
+                value={imageUrlInput}
+                onChange={(e) => handleUrlInputChange(e.target.value)}
+                placeholder='https://example.com/avatar.jpg'
+                className='text-sm'
+              />
+              <p className='text-xs text-muted-foreground'>
+                Paste a direct image link. This will be saved when you click Save Profile.
+              </p>
+            </div>
+          )}
+          
           <div className='space-y-1'>
             <label className='text-sm font-medium'>Name</label>
             <Input value={user?.name ?? ''} disabled className='opacity-60' />
@@ -136,15 +288,6 @@ export default function TutorProfilePage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSave} className='space-y-4'>
-            <div className='space-y-1'>
-              <label className='text-sm font-medium'>Profile Picture URL</label>
-              <Input
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                placeholder='https://example.com/avatar.jpg'
-                className='bg-transparent'
-              />
-            </div>
             <div className='space-y-1'>
               <label className='text-sm font-medium'>Bio</label>
               <textarea

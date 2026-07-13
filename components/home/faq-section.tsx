@@ -15,7 +15,7 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: 'How does booking a session work?',
-    a: 'Visit any tutor\'s profile and choose an available time slot from their calendar. After confirming your booking, you\'ll receive a confirmation and can manage it from your student dashboard.',
+    a: "Visit any tutor's profile and choose an available time slot from their calendar. After confirming your booking, you'll receive a confirmation and can manage it from your student dashboard.",
   },
   {
     q: 'What payment methods are accepted?',
@@ -30,12 +30,12 @@ const FAQ_ITEMS: FaqItem[] = [
     a: 'Every tutor profile goes through an admin review before becoming visible on the platform. We verify their identity and qualifications to ensure quality and safety.',
   },
   {
-    q: 'What if I\'m not satisfied with a session?',
-    a: 'We have a satisfaction policy — if a session doesn\'t meet expectations, reach out to our support team within 24 hours and we\'ll work to resolve it fairly for both parties.',
+    q: "What if I'm not satisfied with a session?",
+    a: "We have a satisfaction policy — if a session doesn't meet expectations, reach out to our support team within 24 hours and we'll work to resolve it fairly for both parties.",
   },
   {
     q: 'Can I become a tutor on SkillBridge?',
-    a: 'Absolutely! Sign up, select the Tutor role, complete your profile with your subjects, rates, and availability. Your profile will be reviewed by our admin team before going live.',
+    a: "Absolutely! Sign up, select the Tutor role, complete your profile with your subjects, rates, and availability. Your profile will be reviewed by our admin team before going live.",
   },
 ]
 
@@ -43,16 +43,16 @@ export default function FaqSection() {
   const [open, setOpen] = useState<number | null>(null)
 
   return (
-    <section className='py-24 px-6 bg-slate-950'>
+    <section className='py-24 px-6 bg-background border-t border-border'>
       <div className='max-w-3xl mx-auto'>
         <div className='text-center mb-14'>
-          <span className='inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full mb-4'>
+          <span className='inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-300 px-3 py-1 rounded-full mb-4'>
             ❓ Got Questions?
           </span>
-          <h2 className='text-3xl md:text-4xl font-extrabold text-white tracking-tight'>
+          <h2 className='text-3xl md:text-4xl font-extrabold text-foreground tracking-tight'>
             Frequently Asked Questions
           </h2>
-          <p className='text-slate-400 mt-3 font-light'>
+          <p className='text-muted-foreground mt-3 font-light'>
             Everything you need to know about SkillBridge.
           </p>
         </div>
@@ -77,7 +77,7 @@ export default function FaqSection() {
                 >
                   <span
                     className={`font-semibold text-sm leading-snug transition-colors duration-200 ${
-                      isOpen ? 'text-indigo-300' : 'text-foreground group-hover:text-foreground/80'
+                      isOpen ? 'text-indigo-500 dark:text-indigo-300' : 'text-foreground group-hover:text-foreground/80'
                     }`}
                   >
                     {item.q}
@@ -85,7 +85,7 @@ export default function FaqSection() {
                   <ChevronDown
                     className={`h-5 w-5 shrink-0 transition-all duration-300 ${
                       isOpen
-                        ? 'rotate-180 text-indigo-400'
+                        ? 'rotate-180 text-indigo-500 dark:text-indigo-400'
                         : 'text-muted-foreground group-hover:text-foreground'
                     }`}
                   />
@@ -97,7 +97,7 @@ export default function FaqSection() {
                   }`}
                 >
                   <div className='overflow-hidden'>
-                    <p className='px-6 pb-5 text-sm text-slate-400 leading-relaxed'>
+                    <p className='px-6 pb-5 text-sm text-muted-foreground leading-relaxed'>
                       {item.a}
                     </p>
                   </div>
