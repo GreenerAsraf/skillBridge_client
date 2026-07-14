@@ -277,9 +277,9 @@ To run this project locally, follow these steps:
 
 Backend Repo: https://github.com/GreenerAsraf/skillBridge_backend
 
-Frontend Live: https://skill-bridge-client-pi.vercel.app/
+Frontend Live: https://skill-bridge-client-pi.vercel.app
 
-Backend Live: https://skillbridgebackend-production-19ba.up.railway.app/
+Backend Live: https://skillbridge-backend-xm86.onrender.com
 
 Demo Video: https://www.loom.com/share/881015c6bfc24272a1451721fd03b7e8
 

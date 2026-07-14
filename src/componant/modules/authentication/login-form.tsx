@@ -26,7 +26,8 @@ import { Zap, ShieldCheck } from 'lucide-react'
 
 // Demo credentials — update these to match your seeded DB data
 const DEMO_CREDENTIALS = {
-  user:  { email: 'student@skillbridge.com', password: 'Student@123' },
+  user: { email: 'teacher1@gmail.com', password: 'Asraf123' },
+  
   admin: { email: 'admin@example.com',   password: 'password123'   },
 }
 
@@ -165,7 +166,7 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
               className='w-full flex items-center gap-1.5 text-xs border-indigo-500/40 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 transition-all'
             >
               <Zap className='h-3 w-3' />
-              Demo User
+              Demo Teacher
             </Button>
             <Button
               id='demo-admin-btn'
