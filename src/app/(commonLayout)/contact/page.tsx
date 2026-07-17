@@ -63,7 +63,7 @@ export default function ContactPage() {
           {/* Info cards */}
           <div className='md:col-span-1 space-y-4'>
             {[
-              { icon: <Mail className='h-4 w-4 text-emerald-400' />, title: 'Email Us', desc: 'support@skillbridge.edu' },
+              { icon: <Mail className='h-4 w-4 text-emerald-400' />, title: 'Email Us', desc: 'hello@nexamentor.edu' },
               { icon: <Phone className='h-4 w-4 text-cyan-400' />, title: 'Call Support', desc: '+1 (555) 304-4050' },
               { icon: <Clock className='h-4 w-4 text-indigo-400' />, title: 'Operation Hours', desc: 'Mon - Fri, 9 AM - 6 PM' }
             ].map((item, idx) => (
@@ -150,3 +150,4 @@ export default function ContactPage() {
     </div>
   )
 }
+

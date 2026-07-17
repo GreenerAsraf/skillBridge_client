@@ -1,11 +1,11 @@
-# SkillBridge 🎓
+# NexaMentor 🎓
 **"Connect with Expert Tutors, Learn Anything"**
 
 ---
 
 ## Project Overview
 
-SkillBridge is a full-stack web application that connects learners with expert tutors. Students can browse tutor profiles, view availability, and book sessions instantly. Tutors can manage their profiles, set availability, and track their teaching sessions. Admins oversee the platform and manage users.
+NexaMentor is a full-stack web application that connects learners with expert tutors. Students can browse tutor profiles, view availability, and book sessions instantly. Tutors can manage their profiles, set availability, and track their teaching sessions. Admins oversee the platform and manage users.
 
 ---
 
@@ -242,7 +242,7 @@ FRONTEND_URL="https://skill-bridge-client-pi.vercel.app"
 ## Submission
 
 📋 **See [README.md](./README.md) for submission guidelines, timeline, and marks.**
-# skillBridge_client
+# NexaMentor_client
 
 
 ## Installation & Setup
@@ -273,9 +273,9 @@ To run this project locally, follow these steps:
  
 
 
- Frontend Repo: https://github.com/GreenerAsraf/skillBridge_client
+ Frontend Repo: https://github.com/GreenerAsraf/NexaMentor_client
 
-Backend Repo: https://github.com/GreenerAsraf/skillBridge_backend
+Backend Repo: https://github.com/GreenerAsraf/NexaMentor_backend
 
 Frontend Live: https://skill-bridge-client-pi.vercel.app
 
@@ -286,3 +286,4 @@ Demo Video: https://www.loom.com/share/881015c6bfc24272a1451721fd03b7e8
 Admin Email: admin@example.com
 
 Admin Password: password123
+

@@ -34,7 +34,7 @@ const FAQ_ITEMS: FaqItem[] = [
     a: "We have a satisfaction policy — if a session doesn't meet expectations, reach out to our support team within 24 hours and we'll work to resolve it fairly for both parties.",
   },
   {
-    q: 'Can I become a tutor on SkillBridge?',
+    q: 'Can I become a tutor on NexaMentor?',
     a: "Absolutely! Sign up, select the Tutor role, complete your profile with your subjects, rates, and availability. Your profile will be reviewed by our admin team before going live.",
   },
 ]
@@ -53,7 +53,7 @@ export default function FaqSection() {
             Frequently Asked Questions
           </h2>
           <p className='text-muted-foreground mt-3 font-light'>
-            Everything you need to know about SkillBridge.
+            Everything you need to know about NexaMentor.
           </p>
         </div>
 
@@ -110,3 +110,4 @@ export default function FaqSection() {
     </section>
   )
 }
+

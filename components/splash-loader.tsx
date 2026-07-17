@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 /**
  * SplashLoader displays a full-screen branded loading screen
- * with an animated "Welcome to SkillBridge" message and logo.
+ * with an animated "Welcome to NexaMentor" message and logo.
  * It fades out once `show` becomes false.
  */
 export function SplashLoader({ show }: { show: boolean }) {
@@ -24,7 +24,7 @@ export function SplashLoader({ show }: { show: boolean }) {
     <div
       className='splash-loader'
       style={{ opacity: show ? 1 : 0 }}
-      aria-label='Loading SkillBridge'
+      aria-label='Loading NexaMentor'
       role='status'
     >
       {/* Animated background blobs */}
@@ -40,8 +40,8 @@ export function SplashLoader({ show }: { show: boolean }) {
         {/* Logo */}
         <div className='splash-logo-wrapper'>
           <img
-            src='/logo1.png'
-            alt='SkillBridge Logo'
+            src='/nexamentor-logo.svg'
+            alt='NexaMentor Logo'
             className='splash-logo'
           />
         </div>
@@ -50,10 +50,10 @@ export function SplashLoader({ show }: { show: boolean }) {
         <div className='splash-text-group'>
           <p className='splash-welcome-label'>Welcome to</p>
           <h1 className='splash-title'>
-            <span className='splash-title-skill'>Skill</span>
-            <span className='splash-title-bridge'>Bridge</span>
+            <span className='splash-title-skill'>Nexa</span>
+            <span className='splash-title-bridge'>Mentor</span>
           </h1>
-          <p className='splash-tagline'>Connect · Learn · Grow</p>
+          <p className='splash-tagline'>Find mentors. Build momentum.</p>
         </div>
 
         {/* Skeleton shimmer bars */}
@@ -73,3 +73,5 @@ export function SplashLoader({ show }: { show: boolean }) {
     </div>
   )
 }
+
+

@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Star, Users, BookOpen } from 'lucide-react'
 import { FeaturedTutors } from '@/components/featured-tutors'
 import HeroSearchForm from '@/components/hero-search-form'
 import CategoriesSection from '@/components/home/categories-section'
@@ -20,13 +19,13 @@ export default function HomePage() {
 
         <div className='max-w-4xl mx-auto space-y-6 relative z-10'>
           <span className='inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase bg-indigo-100 border border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/20 dark:text-indigo-300 px-3 py-1 rounded-full animate-pulse'>
-            ⚡ SkillBridge Platform
+            Mentor-led Learning Hub
           </span>
           <h1 className='text-5xl md:text-6xl font-extrabold leading-tight tracking-tight bg-gradient-to-r from-slate-900 via-slate-700 to-slate-500 dark:from-white dark:via-slate-100 dark:to-slate-400 bg-clip-text text-transparent'>
-            Connect with Expert Tutors,<br /><span className='bg-gradient-to-r from-emerald-500 to-cyan-500 dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent'>Learn Anything</span>
+            Meet the right mentor,<br /><span className='bg-gradient-to-r from-emerald-500 to-cyan-500 dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent'>move faster</span>
           </h1>
           <p className='text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-light leading-relaxed'>
-            Browse hundreds of verified tutors, book instant sessions, and unlock your potential with custom learning schedules.
+            NexaMentor helps curious learners find vetted tutors, book focused sessions, and turn confusing topics into confident progress.
           </p>
 
           <HeroSearchForm />
@@ -89,7 +88,7 @@ export default function HomePage() {
         <div className='absolute inset-0 bg-[linear-gradient(to_right,#ffffff0c_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0c_1px,transparent_1px)] bg-[size:24px_24px]' />
         <div className='relative z-10 max-w-2xl mx-auto space-y-6'>
           <h2 className='text-4xl font-black tracking-tight text-white'>Ready to start learning?</h2>
-          <p className='text-emerald-100 max-w-md mx-auto text-lg font-light'>Join thousands of students already unlocking new skills on SkillBridge.</p>
+          <p className='text-emerald-100 max-w-md mx-auto text-lg font-light'>Join learners using NexaMentor to build skills with guidance that fits their goals.</p>
           <Button asChild size='lg' className='bg-slate-950 hover:bg-slate-900 text-white font-bold px-8 py-6 rounded-xl transition-all duration-300 hover:scale-[1.03] shadow-xl shadow-slate-950/20 border-0'>
             <Link href='/register'>Create a Free Account</Link>
           </Button>
@@ -98,3 +97,4 @@ export default function HomePage() {
     </div>
   )
 }
+

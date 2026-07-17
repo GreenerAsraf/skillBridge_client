@@ -4,7 +4,6 @@ import { Suspense, useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { apiFetch } from '@/lib/api'
 import { Star, Search, SlidersHorizontal, Filter, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -23,8 +22,92 @@ type Tutor = {
 
 type Category = { id: string; name: string }
 type SortOption = 'default' | 'rating-desc' | 'price-asc' | 'price-desc'
+type TutorsResponse = {
+  data?: Tutor[] | { data?: Tutor[]; meta?: { total?: number; totalPage?: number } }
+  meta?: { total?: number; totalPage?: number }
+  pagination?: { total?: number; totalPage?: number }
+}
 
 const PAGE_SIZE = 9
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/+$/, '') ?? 'https://skillbridge-backend-xm86.onrender.com'
+
+async function fetchBackend<T>(path: string): Promise<T> {
+  const res = await fetch(`${BACKEND_URL}${path}`, { credentials: 'include' })
+
+  let json: unknown = null
+  const contentType = res.headers.get('content-type')
+  if (contentType?.includes('application/json')) {
+    json = await res.json()
+  }
+
+  if (!res.ok) {
+    const message =
+      typeof json === 'object' && json && 'message' in json && typeof json.message === 'string'
+        ? json.message
+        : `Request failed with status ${res.status}`
+    throw new Error(message)
+  }
+
+  return json as T
+}
+
+function normalizeTutorsResponse(response: TutorsResponse) {
+  const nestedData = Array.isArray(response.data) ? response.data : response.data?.data
+  const meta = response.meta ?? (!Array.isArray(response.data) ? response.data?.meta : undefined) ?? response.pagination
+
+  return {
+    tutors: nestedData ?? [],
+    total: meta?.total ?? nestedData?.length ?? 0,
+  }
+}
+
+function filterTutorsLocally(tutors: Tutor[], filters: {
+  search: string
+  category: string
+  minPrice: string
+  maxPrice: string
+  sortBy: SortOption
+}) {
+  const query = filters.search.trim().toLowerCase()
+  const min = filters.minPrice ? Number(filters.minPrice) : null
+  const max = filters.maxPrice ? Number(filters.maxPrice) : null
+
+  const filtered = tutors.filter((tutor) => {
+    const searchable = [
+      tutor.user?.name,
+      tutor.user?.email,
+      tutor.bio,
+      tutor.category?.name,
+      ...(tutor.categories?.map((category) => category.name) ?? []),
+      ...(tutor.subject ?? []),
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+
+    const categoryMatches =
+      filters.category === 'ALL' ||
+      tutor.category?.name === filters.category ||
+      tutor.categories?.some((category) => category.name === filters.category) ||
+      tutor.category?.name?.toLowerCase() === filters.category.toLowerCase() ||
+      tutor.categories?.some((category) => category.name.toLowerCase() === filters.category.toLowerCase())
+
+    const price = tutor.hourlyPrice ?? 0
+    const priceMatches = (min == null || price >= min) && (max == null || price <= max)
+
+    return (!query || searchable.includes(query)) && categoryMatches && priceMatches
+  })
+
+  if (filters.sortBy === 'rating-desc') {
+    filtered.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
+  } else if (filters.sortBy === 'price-asc') {
+    filtered.sort((a, b) => (a.hourlyPrice ?? Number.MAX_SAFE_INTEGER) - (b.hourlyPrice ?? Number.MAX_SAFE_INTEGER))
+  } else if (filters.sortBy === 'price-desc') {
+    filtered.sort((a, b) => (b.hourlyPrice ?? 0) - (a.hourlyPrice ?? 0))
+  }
+
+  return filtered
+}
 
 /**
  * Inner component that reads URL search params — must be wrapped in <Suspense>.
@@ -37,6 +120,7 @@ function BrowseTutorsInner() {
   const [tutors, setTutors] = useState<Tutor[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [total, setTotal] = useState(0)
 
   const [search, setSearch] = useState(searchParams.get('search') ?? '')
@@ -60,7 +144,7 @@ function BrowseTutorsInner() {
 
   // Load categories once
   useEffect(() => {
-    apiFetch<{ data: Category[] }>('/api/categories')
+    fetchBackend<{ data: Category[] }>('/api/categories')
       .then((r) => setCategories(r.data ?? []))
       .catch(() => {})
   }, [])
@@ -68,21 +152,43 @@ function BrowseTutorsInner() {
   // Fetch tutors whenever filters change
   const fetchTutors = useCallback(() => {
     setLoading(true)
+    setError('')
     const params = new URLSearchParams()
-    if (debouncedSearch) params.set('searchTerm', debouncedSearch)
-    if (selectedCategory !== 'ALL') params.set('categoryId', selectedCategory)
+    if (debouncedSearch) params.set('search', debouncedSearch)
+    if (selectedCategory !== 'ALL') params.set('category', selectedCategory)
     if (minPrice) params.set('minPrice', minPrice)
     if (maxPrice) params.set('maxPrice', maxPrice)
-    if (sortBy !== 'default') params.set('sortBy', sortBy)
+    if (sortBy !== 'default') params.set('sort', sortBy)
     params.set('page', String(page))
     params.set('limit', String(PAGE_SIZE))
 
-    apiFetch<{ data: Tutor[]; meta?: { total: number } }>(`/api/tutors?${params.toString()}`)
+    fetchBackend<TutorsResponse>(`/api/tutors?${params.toString()}`)
       .then((r) => {
-        setTutors(r.data ?? [])
-        setTotal(r.meta?.total ?? r.data?.length ?? 0)
+        const normalized = normalizeTutorsResponse(r)
+        setTutors(normalized.tutors)
+        setTotal(normalized.total)
       })
-      .catch(() => {})
+      .catch(() => {
+        fetchBackend<TutorsResponse>('/api/tutors?limit=100')
+          .then((r) => {
+            const normalized = normalizeTutorsResponse(r)
+            const filtered = filterTutorsLocally(normalized.tutors, {
+              search: debouncedSearch,
+              category: selectedCategory,
+              minPrice,
+              maxPrice,
+              sortBy,
+            })
+            const start = (page - 1) * PAGE_SIZE
+            setTutors(filtered.slice(start, start + PAGE_SIZE))
+            setTotal(filtered.length)
+          })
+          .catch((err: unknown) => {
+            setTutors([])
+            setTotal(0)
+            setError(err instanceof Error ? err.message : 'Unable to load tutors.')
+          })
+      })
       .finally(() => setLoading(false))
   }, [debouncedSearch, selectedCategory, minPrice, maxPrice, sortBy, page])
 
@@ -123,7 +229,7 @@ function BrowseTutorsInner() {
           <p className='text-slate-600 dark:text-slate-400 mt-1.5 text-sm font-light'>
             Find the perfect tutor by subject, category, or name.{' '}
             <span className='text-slate-500'>
-              {!loading && `${total} tutor${total !== 1 ? 's' : ''} available`}
+              {!loading && !error && `${total} tutor${total !== 1 ? 's' : ''} available`}
             </span>
           </p>
         </div>
@@ -155,7 +261,7 @@ function BrowseTutorsInner() {
             >
               <option className='bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100' value='ALL'>All Categories</option>
               {categories.map((c) => (
-                <option className='bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100' key={c.id} value={c.id}>{c.name}</option>
+                <option className='bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100' key={c.id} value={c.name}>{c.name}</option>
               ))}
             </select>
           </div>
@@ -207,7 +313,7 @@ function BrowseTutorsInner() {
             )}
             {selectedCategory !== 'ALL' && (
               <Chip
-                label={categories.find((c) => c.id === selectedCategory)?.name ?? selectedCategory}
+                label={categories.find((c) => c.name === selectedCategory || c.id === selectedCategory)?.name ?? selectedCategory}
                 onRemove={() => setSelectedCategory('ALL')}
                 color='indigo'
               />
@@ -236,7 +342,14 @@ function BrowseTutorsInner() {
         )}
 
         {/* Tutors Grid */}
-        {loading ? (
+        {error ? (
+          <div className='text-center py-24 space-y-3'>
+            <p className='text-slate-600 dark:text-slate-400 font-medium'>{error}</p>
+            <button onClick={fetchTutors} className='text-sm text-indigo-500 dark:text-indigo-400 underline hover:text-indigo-600 dark:hover:text-indigo-300'>
+              Try again
+            </button>
+          </div>
+        ) : loading ? (
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
             {Array.from({ length: PAGE_SIZE }).map((_, i) => (
               <div key={i} className='h-52 rounded-xl bg-slate-200 dark:bg-slate-900 animate-pulse' />

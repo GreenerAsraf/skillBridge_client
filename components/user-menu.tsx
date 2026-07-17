@@ -113,7 +113,7 @@ export function UserMenu() {
                 </span>
               )}
               <div className='min-w-0'>
-                <p className='text-sm font-semibold text-white truncate'>{user.name || 'SkillBridge User'}</p>
+                <p className='text-sm font-semibold text-white truncate'>{user.name || 'NexaMentor User'}</p>
                 <p className='text-xs text-slate-400 truncate'>{user.email}</p>
               </div>
             </div>
@@ -203,3 +203,4 @@ function DropdownItem({
     </Link>
   )
 }
+

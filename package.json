@@ -1,5 +1,5 @@
 {
-  "name": "skillbridge-client",
+  "name": "nexamentor-client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -42,3 +42,4 @@
     "typescript": "^5"
   }
 }
+

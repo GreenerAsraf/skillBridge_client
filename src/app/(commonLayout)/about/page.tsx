@@ -15,9 +15,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'About SkillBridge – Our Mission & Story',
+  title: 'About NexaMentor - Our Mission & Story',
   description:
-    'Learn how SkillBridge is connecting students with expert tutors worldwide to make quality, personalized education accessible to everyone.',
+    'Learn how NexaMentor pairs ambitious learners with trusted mentors for focused, personalized progress.',
 }
 
 /* ── Static data ─────────────────────────────────────────── */
@@ -44,7 +44,7 @@ const values = [
     bg: 'bg-cyan-500/10',
     border: 'border-cyan-500/20',
     title: 'Vetted Quality',
-    desc: 'Every tutor on SkillBridge undergoes strict background and skills checks so students always get the best.',
+    desc: 'Every mentor on NexaMentor is reviewed for subject strength, communication, and reliability before meeting learners.',
   },
   {
     icon: Globe,
@@ -72,7 +72,7 @@ const team = [
 ]
 
 const timeline = [
-  { year: '2022', event: 'SkillBridge founded with a vision to democratise personalised tutoring.' },
+  { year: '2022', event: 'NexaMentor founded to make personal mentorship easier to find and book.' },
   { year: '2023', event: 'Launched beta platform with 50 hand-picked tutors across 5 subjects.' },
   { year: '2024', event: 'Hit 5,000 sessions milestone and introduced live booking & payments.' },
   { year: '2025', event: 'Expanded to 40+ countries with 500+ verified expert tutors.' },
@@ -105,8 +105,7 @@ export default function AboutPage() {
             <span className='about-gradient-text-pink'>Learners</span>
           </h1>
           <p className='text-muted-foreground text-lg max-w-xl mx-auto font-light leading-relaxed'>
-            SkillBridge was founded on a simple principle: high-quality,
-            personalised education should be accessible instantly, anywhere in the world.
+            NexaMentor was founded on a simple principle: learners move faster when expert guidance is easy to find, trust, and schedule.
           </p>
           <div className='flex flex-wrap gap-3 justify-center pt-2'>
             <Link href='/tutors' className='about-cta-primary'>
@@ -192,7 +191,7 @@ export default function AboutPage() {
               What We Stand By
             </h2>
             <p className='text-muted-foreground mt-3 font-light max-w-xl mx-auto text-sm'>
-              Every decision we make is guided by four principles that define the SkillBridge experience.
+              Every decision we make is guided by four principles that define the NexaMentor experience.
             </p>
           </div>
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5'>
@@ -270,7 +269,7 @@ export default function AboutPage() {
             Ready to start your journey?
           </h2>
           <p className='text-muted-foreground font-light'>
-            Join thousands of students already unlocking new skills on SkillBridge.
+            Join learners already building confidence with NexaMentor.
           </p>
           <div className='flex flex-wrap gap-3 justify-center pt-2'>
             <Link href='/register' className='about-cta-primary'>
@@ -285,3 +284,4 @@ export default function AboutPage() {
     </main>
   )
 }
+

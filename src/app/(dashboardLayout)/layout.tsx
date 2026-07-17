@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className='flex-1 flex flex-col'>
         {/* Dashboard top bar */}
         <header className='h-14 border-b bg-background flex items-center justify-between px-6'>
-          <Link href="/" className='text-xl font-semibold text-foreground bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent'>SkillBridge</Link>
+          <Link href="/" className='text-xl font-semibold text-foreground bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent'>NexaMentor</Link>
           <UserMenu />
         </header>
         <main className='flex-1 p-6 bg-muted/10'>
@@ -41,3 +41,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   )
 }
+

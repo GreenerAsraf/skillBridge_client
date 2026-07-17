@@ -18,7 +18,7 @@ const FALLBACK: Review[] = [
     id: '1',
     rating: 5,
     comment:
-      'SkillBridge completely changed how I learn. My math tutor made calculus click in just 3 sessions. Highly recommend!',
+      'NexaMentor completely changed how I learn. My math tutor made calculus click in just 3 sessions. Highly recommend!',
     student: { name: 'Aisha Rahman' },
     tutor: { user: { name: 'Prof. David Lee' } },
   },
@@ -111,7 +111,7 @@ export default function TestimonialsSection() {
             What Our Students Say
           </h2>
           <p className='text-muted-foreground mt-3 font-light'>
-            Real results from real learners — see why thousands trust SkillBridge.
+            Real results from real learners — see why thousands trust NexaMentor.
           </p>
         </div>
 
@@ -232,3 +232,4 @@ function TestimonialCard({ review }: { review: Review }) {
     </div>
   )
 }
+

@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'SkillBridge',
-  description: 'SkillBridge - Connect and Learn'
+  title: 'NexaMentor',
+  description: 'NexaMentor - Personalized tutoring for ambitious learners'
 }
 
 /**
@@ -46,3 +46,4 @@ export default function RootLayout({
     </html>
   )
 }
+

@@ -43,7 +43,7 @@ const STATIC_POSTS: BlogPost[] = [
     slug: 'online-tutoring-trends-2026',
     content:
       'AI-assisted learning, asynchronous sessions, and global access — the tutoring landscape is evolving rapidly. Here\'s what to expect.',
-    authorName: 'SkillBridge Team',
+    authorName: 'NexaMentor Team',
     createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     category: 'Industry',
   },
@@ -114,7 +114,7 @@ export default function BlogPage() {
       <div className='border-b border-border bg-gradient-to-b from-indigo-950/40 to-transparent py-16 px-6 text-center'>
         <div className='max-w-3xl mx-auto'>
           <span className='inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full mb-5'>
-            ✍️ SkillBridge Blog
+            ✍️ NexaMentor Blog
           </span>
           <h1 className='text-4xl md:text-5xl font-extrabold text-white tracking-tight'>
             Insights for Smarter Learning
@@ -232,3 +232,4 @@ export default function BlogPage() {
     </div>
   )
 }
+

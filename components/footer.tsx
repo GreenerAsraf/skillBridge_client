@@ -17,10 +17,10 @@ export default function Footer() {
           {/* Brand */}
           <div className='space-y-4 col-span-1 md:col-span-1'>
             <Link href="/" className='text-2xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent tracking-tight'>
-              SkillBridge
+              NexaMentor
             </Link>
             <p className='text-xs font-light leading-relaxed text-muted-foreground'>
-              Empowering students worldwide by connecting them with certified expert educators for instant, personalized learning.
+              Helping learners find trusted mentors for focused sessions, flexible scheduling, and steady academic progress.
             </p>
             <div className='flex items-center gap-3 pt-2'>
               {[
@@ -76,7 +76,7 @@ export default function Footer() {
             <h4 className='text-sm font-bold text-foreground mb-4 tracking-wider uppercase'>Get in Touch</h4>
             <div className='flex items-center gap-2.5'>
               <Mail className='h-4 w-4 text-emerald-500 dark:text-emerald-400 shrink-0' />
-              <span>support@skillbridge.edu</span>
+              <span>hello@nexamentor.edu</span>
             </div>
             <div className='flex items-center gap-2.5'>
               <MapPin className='h-4 w-4 text-cyan-500 dark:text-cyan-400 shrink-0' />
@@ -91,7 +91,7 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className='border-t border-border pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-light text-muted-foreground'>
-          <p>© {new Date().getFullYear()} SkillBridge Inc. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} NexaMentor Inc. All rights reserved.</p>
           <p className='flex items-center gap-1'>
             Made with <Heart className='h-3 w-3 text-rose-500 fill-rose-500' /> for modern education.
           </p>
@@ -100,3 +100,4 @@ export default function Footer() {
     </footer>
   )
 }
+
